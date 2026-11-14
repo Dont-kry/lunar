@@ -1,6 +1,7 @@
 
 import csv
 import io
+import json
 import math
 import re
 import urllib.parse
@@ -20,11 +21,8 @@ from .serializers import FeatureSerializer
 
 JPL_HORIZONS_URL = "https://ssd.jpl.nasa.gov/api/horizons.api"
 
-# Sampling every 30 minutes.
 STEP_MINUTES = 30
-
-# Maximum mission evaluation period.
-MAX_DURATION_HOURS = 168
+MAX_DURATION_HOURS = 2160
 
 
 def home(request):
@@ -41,21 +39,16 @@ class FeatureDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = FeatureSerializer
 
 
-def parse_datetime(value):
-    """
-    Accept an ISO datetime.
-    If the browser sends a datetime without a timezone,
-    interpret it as UTC.
-    """
+def parse_datetime(value, field_name="date and time"):
     if not value:
-        raise ValueError("Start date and time are required.")
+        raise ValueError(f"{field_name} is required.")
 
     try:
         result = datetime.fromisoformat(
             str(value).replace("Z", "+00:00")
         )
-    except ValueError:
-        raise ValueError("Invalid start date and time.")
+    except (ValueError, TypeError):
+        raise ValueError(f"Invalid {field_name}.")
 
     if result.tzinfo is None:
         result = result.replace(tzinfo=timezone.utc)
@@ -63,7 +56,7 @@ def parse_datetime(value):
     return result.astimezone(timezone.utc)
 
 
-def get_horizons_elevations(
+def get_horizons_positions(
     target,
     latitude,
     longitude,
@@ -71,14 +64,14 @@ def get_horizons_elevations(
     end_time,
 ):
     """
-    Retrieve apparent azimuth/elevation samples from JPL Horizons.
+    Retrieve apparent azimuth and elevation from JPL Horizons.
 
-    target:
-        10 = Sun
+    Targets:
+        10  = Sun
         399 = Earth
 
     Observer:
-        A user-defined location on the Moon (301).
+        User-defined location on the Moon.
     """
 
     params = {
@@ -113,23 +106,30 @@ def get_horizons_elevations(
 
     request = urllib.request.Request(
         url,
-        headers={"User-Agent": "LunarMissionBrowser/1.0"},
+        headers={
+            "User-Agent": "LunarMissionBrowser/1.0"
+        },
     )
 
     try:
-        with urllib.request.urlopen(request, timeout=60) as response:
+        with urllib.request.urlopen(
+            request,
+            timeout=60,
+        ) as response:
             result = response.read().decode("utf-8")
+
     except Exception as error:
         raise RuntimeError(
             f"Could not contact JPL Horizons: {error}"
         )
 
-    import json
-
     try:
         payload = json.loads(result)
+
     except json.JSONDecodeError:
-        raise RuntimeError("JPL returned an invalid response.")
+        raise RuntimeError(
+            "JPL returned an invalid response."
+        )
 
     if payload.get("error"):
         raise RuntimeError(payload["error"])
@@ -141,9 +141,18 @@ def get_horizons_elevations(
             "JPL did not return an ephemeris table."
         )
 
-    table = table.split("$$SOE", 1)[1].split("$$EOE", 1)[0]
+    table = (
+        table.split("$$SOE", 1)[1]
+        .split("$$EOE", 1)[0]
+    )
 
-    samples = {}
+    positions = {}
+
+    date_formats = (
+        "%Y-%b-%d %H:%M",
+        "%Y-%b-%d %H:%M:%S",
+        "%Y-%b-%d %H:%M:%S.%f",
+    )
 
     for row in csv.reader(io.StringIO(table)):
         if not row:
@@ -151,23 +160,23 @@ def get_horizons_elevations(
 
         date_text = row[0].strip()
 
-        # Skip empty rows and non-date rows.
-        if not re.match(r"^\d{4}-[A-Za-z]{3}-\d{2}", date_text):
+        if not re.match(
+            r"^\d{4}-[A-Za-z]{3}-\d{2}",
+            date_text,
+        ):
             continue
 
         sample_time = None
 
-        for date_format in (
-            "%Y-%b-%d %H:%M",
-            "%Y-%b-%d %H:%M:%S",
-            "%Y-%b-%d %H:%M:%S.%f",
-        ):
+        for date_format in date_formats:
             try:
                 sample_time = datetime.strptime(
                     date_text,
                     date_format,
                 ).replace(tzinfo=timezone.utc)
+
                 break
+
             except ValueError:
                 continue
 
@@ -178,31 +187,47 @@ def get_horizons_elevations(
 
         for item in row[1:]:
             try:
-                numeric_values.append(float(item.strip()))
+                numeric_values.append(
+                    float(item.strip())
+                )
+
             except (ValueError, TypeError):
                 continue
 
         if len(numeric_values) < 2:
             continue
 
-        # Quantity 4 returns azimuth and elevation.
+        azimuth = numeric_values[-2]
         elevation = numeric_values[-1]
 
-        samples[sample_time] = elevation
+        positions[sample_time] = {
+            "azimuth_deg": azimuth,
+            "elevation_deg": elevation,
+        }
 
-    if not samples:
+    if not positions:
         raise RuntimeError(
-            "Could not parse JPL elevation data. "
+            "Could not parse JPL position data. "
             "Check the Horizons response format."
         )
 
-    return samples
+    return positions
 
 
-def create_intervals(samples, field, interval_type, end_time):
+def create_intervals(
+    samples,
+    field,
+    interval_type,
+    end_time,
+):
     """
-    Convert sampled visibility into continuous availability intervals.
-    Interval boundaries are approximate to the 30-minute sampling step.
+    Create visibility intervals from elevation samples.
+
+    Visibility:
+        Elevation greater than zero degrees.
+
+    Interval boundaries:
+        30-minute sampling resolution.
     """
 
     intervals = []
@@ -210,7 +235,10 @@ def create_intervals(samples, field, interval_type, end_time):
     active_elevations = []
 
     for sample in samples:
-        visible = sample[field] is not None and sample[field] > 0
+        visible = (
+            sample[field] is not None
+            and sample[field] > 0
+        )
 
         if visible and active_start is None:
             active_start = sample["time"]
@@ -224,18 +252,29 @@ def create_intervals(samples, field, interval_type, end_time):
 
             intervals.append({
                 "type": interval_type,
-                "start": active_start.isoformat().replace("+00:00", "Z"),
-                "end": interval_end.isoformat().replace("+00:00", "Z"),
+                "start": (
+                    active_start.isoformat()
+                    .replace("+00:00", "Z")
+                ),
+                "end": (
+                    interval_end.isoformat()
+                    .replace("+00:00", "Z")
+                ),
                 "metrics": {
                     "duration_hours": round(
-                        (interval_end - active_start).total_seconds() / 3600,
+                        (
+                            interval_end - active_start
+                        ).total_seconds() / 3600,
                         2,
                     ),
                     "maximum_elevation_deg": round(
-                        max(active_elevations), 2
+                        max(active_elevations),
+                        2,
                     ),
                     "mean_elevation_deg": round(
-                        sum(active_elevations) / len(active_elevations), 2
+                        sum(active_elevations)
+                        / len(active_elevations),
+                        2,
                     ),
                 },
             })
@@ -246,18 +285,29 @@ def create_intervals(samples, field, interval_type, end_time):
     if active_start is not None:
         intervals.append({
             "type": interval_type,
-            "start": active_start.isoformat().replace("+00:00", "Z"),
-            "end": end_time.isoformat().replace("+00:00", "Z"),
+            "start": (
+                active_start.isoformat()
+                .replace("+00:00", "Z")
+            ),
+            "end": (
+                end_time.isoformat()
+                .replace("+00:00", "Z")
+            ),
             "metrics": {
                 "duration_hours": round(
-                    (end_time - active_start).total_seconds() / 3600,
+                    (
+                        end_time - active_start
+                    ).total_seconds() / 3600,
                     2,
                 ),
                 "maximum_elevation_deg": round(
-                    max(active_elevations), 2
+                    max(active_elevations),
+                    2,
                 ),
                 "mean_elevation_deg": round(
-                    sum(active_elevations) / len(active_elevations), 2
+                    sum(active_elevations)
+                    / len(active_elevations),
+                    2,
                 ),
             },
         })
@@ -267,50 +317,122 @@ def create_intervals(samples, field, interval_type, end_time):
 
 def total_interval_hours(intervals):
     return round(
-        sum(item["metrics"]["duration_hours"] for item in intervals),
+        sum(
+            item["metrics"]["duration_hours"]
+            for item in intervals
+        ),
         2,
+    )
+
+
+def iso_utc(value):
+    return (
+        value.isoformat()
+        .replace("+00:00", "Z")
     )
 
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def evaluate_mission(request):
+
     try:
-        latitude = float(request.data.get("latitude"))
-        longitude = float(request.data.get("longitude"))
-        duration_hours = float(request.data.get("duration_hours"))
-        start_time = parse_datetime(request.data.get("start_time"))
+        # -----------------------------------------
+        # 1. Read location
+        # -----------------------------------------
+
+        try:
+            latitude = float(
+                request.data.get("latitude")
+            )
+
+            longitude = float(
+                request.data.get("longitude")
+            )
+
+        except (TypeError, ValueError):
+            raise ValueError(
+                "Valid latitude and longitude are required."
+            )
+
+        if not math.isfinite(latitude) or not math.isfinite(longitude):
+            raise ValueError(
+                "Latitude and longitude must be valid numbers."
+            )
 
         if not -90 <= latitude <= 90:
-            return Response(
-                {"detail": "Latitude must be between -90 and 90."},
-                status=status.HTTP_400_BAD_REQUEST,
+            raise ValueError(
+                "Latitude must be between -90 and 90."
             )
 
         if not -180 <= longitude <= 360:
-            return Response(
-                {"detail": "Longitude must be between -180 and 360."},
-                status=status.HTTP_400_BAD_REQUEST,
+            raise ValueError(
+                "Longitude must be between -180 and 360."
+            )
+
+        longitude = longitude % 360
+
+        # -----------------------------------------
+        # 2. Read mission start and stop times
+        # -----------------------------------------
+
+        start_time = parse_datetime(
+            request.data.get("start_time"),
+            "Mission start date and time",
+        )
+
+        end_time_value = (
+            request.data.get("end_time")
+            or request.data.get("stop_time")
+        )
+
+        if end_time_value:
+            end_time = parse_datetime(
+                end_time_value,
+                "Mission stop date and time",
+            )
+
+            duration_hours = (
+                end_time - start_time
+            ).total_seconds() / 3600
+
+        else:
+            try:
+                duration_hours = float(
+                    request.data.get("duration_hours")
+                )
+
+            except (TypeError, ValueError):
+                raise ValueError(
+                    "Mission stop date and time or "
+                    "duration_hours is required."
+                )
+
+            if not math.isfinite(duration_hours):
+                raise ValueError(
+                    "Mission duration must be a valid number."
+                )
+
+            end_time = start_time + timedelta(
+                hours=duration_hours
+            )
+
+        if end_time <= start_time:
+            raise ValueError(
+                "Mission stop time must be after start time."
             )
 
         if not 0 < duration_hours <= MAX_DURATION_HOURS:
-            return Response(
-                {
-                    "detail": (
-                        "Duration must be greater than 0 "
-                        "and no more than 168 hours."
-                    )
-                },
-                status=status.HTTP_400_BAD_REQUEST,
+            raise ValueError(
+                "Mission duration must be greater than 0 "
+                "and no more than 2160 hours."
             )
 
-        # Horizons uses east longitude from 0 to 360 degrees.
-        longitude = longitude % 360
+        # -----------------------------------------
+        # 3. Retrieve Sun positions from JPL
+        # -----------------------------------------
 
-        end_time = start_time + timedelta(hours=duration_hours)
-
-        # Request Sun and Earth elevations from the same lunar site.
-        sun_data = get_horizons_elevations(
+        sun_data = get_horizons_positions(
             target=10,
             latitude=latitude,
             longitude=longitude,
@@ -318,7 +440,11 @@ def evaluate_mission(request):
             end_time=end_time,
         )
 
-        earth_data = get_horizons_elevations(
+        # -----------------------------------------
+        # 4. Retrieve Earth positions from JPL
+        # -----------------------------------------
+
+        earth_data = get_horizons_positions(
             target=399,
             latitude=latitude,
             longitude=longitude,
@@ -327,27 +453,59 @@ def evaluate_mission(request):
         )
 
         common_times = sorted(
-            set(sun_data.keys()) & set(earth_data.keys())
+            set(sun_data.keys())
+            & set(earth_data.keys())
         )
 
         if not common_times:
             return Response(
-                {"detail": "No matching Sun and Earth samples returned by JPL."},
+                {
+                    "detail": (
+                        "No matching Sun and Earth samples "
+                        "were returned by JPL."
+                    )
+                },
                 status=status.HTTP_502_BAD_GATEWAY,
             )
+
+        # -----------------------------------------
+        # 5. Combine Sun and Earth samples
+        # -----------------------------------------
 
         samples = []
 
         for sample_time in common_times:
+
+            sun_position = sun_data[sample_time]
+            earth_position = earth_data[sample_time]
+
             samples.append({
                 "time": sample_time,
-                "solar_elevation_deg": round(
-                    sun_data[sample_time], 3
+
+                "solar_azimuth_deg": round(
+                    sun_position["azimuth_deg"],
+                    3,
                 ),
+
+                "solar_elevation_deg": round(
+                    sun_position["elevation_deg"],
+                    3,
+                ),
+
+                "earth_azimuth_deg": round(
+                    earth_position["azimuth_deg"],
+                    3,
+                ),
+
                 "earth_elevation_deg": round(
-                    earth_data[sample_time], 3
+                    earth_position["elevation_deg"],
+                    3,
                 ),
             })
+
+        # -----------------------------------------
+        # 6. Calculate sunlight intervals
+        # -----------------------------------------
 
         sun_intervals = create_intervals(
             samples,
@@ -356,6 +514,10 @@ def evaluate_mission(request):
             end_time,
         )
 
+        # -----------------------------------------
+        # 7. Calculate Earth visibility intervals
+        # -----------------------------------------
+
         earth_intervals = create_intervals(
             samples,
             "earth_elevation_deg",
@@ -363,21 +525,37 @@ def evaluate_mission(request):
             end_time,
         )
 
-        sunlight_hours = total_interval_hours(sun_intervals)
-        communication_hours = total_interval_hours(earth_intervals)
+        sunlight_hours = total_interval_hours(
+            sun_intervals
+        )
+
+        communication_hours = total_interval_hours(
+            earth_intervals
+        )
+
+        # -----------------------------------------
+        # 8. Calculate solar metrics
+        # -----------------------------------------
 
         solar_elevations = [
-            item["solar_elevation_deg"] for item in samples
+            item["solar_elevation_deg"]
+            for item in samples
         ]
 
-        # Approximation for a horizontal panel.
-        # This is NOT a calculation for a tilted or tracking panel.
         solar_power_efficiency = (
             sum(
-                max(0, math.sin(math.radians(value)))
+                max(
+                    0,
+                    math.sin(math.radians(value)),
+                )
                 for value in solar_elevations
-            ) / len(solar_elevations)
+            )
+            / len(solar_elevations)
         ) * 100
+
+        # -----------------------------------------
+        # 9. Combine intervals
+        # -----------------------------------------
 
         intervals = sorted(
             sun_intervals + earth_intervals,
@@ -387,46 +565,88 @@ def evaluate_mission(request):
         sun_visible = sunlight_hours > 0
         earth_visible = communication_hours > 0
 
+        # -----------------------------------------
+        # 10. Feasibility assessment
+        # -----------------------------------------
+
         reasons = []
 
         if not sun_visible:
-            reasons.append("No sampled sunlight availability during this period.")
+            reasons.append(
+                "No sampled sunlight availability "
+                "during this period."
+            )
 
         if not earth_visible:
-            reasons.append("No sampled direct Earth visibility during this period.")
+            reasons.append(
+                "No sampled direct Earth visibility "
+                "during this period."
+            )
 
         if sun_visible and earth_visible:
             rating = "Potentially feasible"
+
             summary = (
-                "Sunlight and direct Earth visibility were both "
-                "available during the selected period. Further engineering "
-                "checks are required."
+                "Sunlight and direct Earth visibility "
+                "were both available during the selected "
+                "period. Further engineering checks are required."
             )
+
         elif sun_visible or earth_visible:
             rating = "Limited availability"
+
             summary = (
-                "Only one of the two required visibility conditions "
-                "was available during the selected period."
+                "Only one of the two required visibility "
+                "conditions was available during the selected period."
             )
+
         else:
             rating = "Low availability"
+
             summary = (
                 "No sampled sunlight or direct Earth visibility "
                 "was found during the selected period."
             )
 
+        # -----------------------------------------
+        # 11. Prepare frontend samples
+        # -----------------------------------------
+
         response_samples = []
 
         for item in samples:
             response_samples.append({
-                "time": item["time"].isoformat().replace("+00:00", "Z"),
-                "solar_elevation_deg": item["solar_elevation_deg"],
-                "earth_elevation_deg": item["earth_elevation_deg"],
+                "time": iso_utc(item["time"]),
+
+                "solar_azimuth_deg": (
+                    item["solar_azimuth_deg"]
+                ),
+
+                "solar_elevation_deg": (
+                    item["solar_elevation_deg"]
+                ),
+
+                "earth_azimuth_deg": (
+                    item["earth_azimuth_deg"]
+                ),
+
+                "earth_elevation_deg": (
+                    item["earth_elevation_deg"]
+                ),
             })
 
+        first_sample = samples[0]
+        last_sample = samples[-1]
+
+        # -----------------------------------------
+        # 12. Return API response
+        # -----------------------------------------
+
         return Response({
-            "start_time": start_time.isoformat().replace("+00:00", "Z"),
-            "end_time": end_time.isoformat().replace("+00:00", "Z"),
+
+            "start_time": iso_utc(start_time),
+
+            "end_time": iso_utc(end_time),
 
             "location": {
                 "latitude": latitude,
@@ -434,19 +654,78 @@ def evaluate_mission(request):
             },
 
             "metrics": {
+
                 "solar_elevation_deg": round(
-                    max(solar_elevations), 2
+                    max(solar_elevations),
+                    2,
                 ),
+
                 "sunlight_hours": sunlight_hours,
+
                 "solar_power_efficiency_percent": round(
-                    solar_power_efficiency, 2
+                    solar_power_efficiency,
+                    2,
                 ),
+
                 "sun_visible": sun_visible,
+
                 "earth_visible": earth_visible,
+
                 "communication_hours": communication_hours,
             },
 
+            "positions_at_start": {
+
+                "time": iso_utc(
+                    first_sample["time"]
+                ),
+
+                "sun": {
+                    "azimuth_deg": (
+                        first_sample["solar_azimuth_deg"]
+                    ),
+                    "elevation_deg": (
+                        first_sample["solar_elevation_deg"]
+                    ),
+                },
+
+                "earth": {
+                    "azimuth_deg": (
+                        first_sample["earth_azimuth_deg"]
+                    ),
+                    "elevation_deg": (
+                        first_sample["earth_elevation_deg"]
+                    ),
+                },
+            },
+
+            "positions_at_end": {
+
+                "time": iso_utc(
+                    last_sample["time"]
+                ),
+
+                "sun": {
+                    "azimuth_deg": (
+                        last_sample["solar_azimuth_deg"]
+                    ),
+                    "elevation_deg": (
+                        last_sample["solar_elevation_deg"]
+                    ),
+                },
+
+                "earth": {
+                    "azimuth_deg": (
+                        last_sample["earth_azimuth_deg"]
+                    ),
+                    "elevation_deg": (
+                        last_sample["earth_elevation_deg"]
+                    ),
+                },
+            },
+
             "intervals": intervals,
+
             "samples": response_samples,
 
             "feasibility": {
@@ -456,12 +735,20 @@ def evaluate_mission(request):
             },
 
             "calculation_notes": [
-                "Sun and Earth elevations are sampled from JPL Horizons.",
-                "Availability interval boundaries have 30-minute resolution.",
+                "Sun and Earth azimuth and elevation are retrieved from JPL Horizons.",
+                "Positions are sampled every 30 minutes.",
+                "Visibility intervals use geometric elevation greater than zero degrees.",
+                "Interval boundaries have 30-minute sampling resolution.",
                 "Solar power efficiency is a horizontal-panel geometric proxy.",
-                "Terrain obstruction, local horizon profiles, "
-                "panel orientation, and link-budget constraints are not included.",
+                "Terrain obstruction, local horizon profiles, panel orientation, and link-budget constraints are not included.",
             ],
+
+            "data_source": {
+                "name": "NASA/JPL Horizons System",
+                "url": JPL_HORIZONS_URL,
+                "observer": "User-defined lunar surface coordinates",
+                "sampling_interval_minutes": STEP_MINUTES,
+            },
         })
 
     except ValueError as error:
@@ -478,6 +765,10 @@ def evaluate_mission(request):
 
     except Exception as error:
         return Response(
-            {"detail": f"Mission evaluation failed: {error}"},
+            {
+                "detail": (
+                    f"Mission evaluation failed: {error}"
+                )
+            },
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )

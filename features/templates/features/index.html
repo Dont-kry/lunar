@@ -1,20 +1,14 @@
-```html
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NASA Moon Explorer</title>
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: Arial, sans-serif;
@@ -28,15 +22,8 @@
             border-bottom: 1px solid #263344;
         }
 
-        header h1 {
-            font-size: 22px;
-            color: #fff;
-        }
-
-        header span {
-            color: #9caec3;
-            font-size: 13px;
-        }
+        header h1 { font-size: 22px; color: #fff; }
+        header span { color: #9caec3; font-size: 13px; }
 
         main {
             width: 92%;
@@ -52,10 +39,7 @@
             margin-bottom: 24px;
         }
 
-        .section h2 {
-            font-size: 19px;
-            margin-bottom: 8px;
-        }
+        .section h2 { font-size: 19px; margin-bottom: 8px; }
 
         .subtitle {
             color: #94a3b8;
@@ -64,9 +48,7 @@
             line-height: 1.5;
         }
 
-        .field {
-            margin-bottom: 15px;
-        }
+        .field { margin-bottom: 15px; }
 
         label {
             display: block;
@@ -75,8 +57,7 @@
             margin-bottom: 7px;
         }
 
-        input,
-        select {
+        input, select {
             width: 100%;
             padding: 11px;
             background: #080e17;
@@ -86,13 +67,9 @@
             outline: none;
         }
 
-        select:focus,
-        input:focus {
-            border-color: #4b9eff;
-        }
+        select:focus, input:focus { border-color: #4b9eff; }
 
-        select option,
-        select optgroup {
+        select option, select optgroup {
             background: #101722;
             color: #e8edf5;
         }
@@ -108,14 +85,8 @@
             transition: 0.2s;
         }
 
-        button:hover {
-            background: #347fc9;
-        }
-
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+        button:hover { background: #347fc9; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .mission-grid {
             display: grid;
@@ -123,13 +94,20 @@
             gap: 15px;
         }
 
-        .mission-grid .field {
-            margin-bottom: 0;
+        .mission-grid .field { margin-bottom: 0; }
+
+        .date-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
         }
+
+        .date-grid .field { margin-bottom: 0; }
 
         .preset-container {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr;
             gap: 15px;
         }
 
@@ -141,10 +119,7 @@
             border-radius: 8px;
         }
 
-        .site-info h3 {
-            font-size: 15px;
-            margin-bottom: 8px;
-        }
+        .site-info h3 { font-size: 15px; margin-bottom: 8px; }
 
         .site-info p {
             color: #9aabc0;
@@ -159,11 +134,11 @@
             border-top: 1px solid #263344;
         }
 
-        .preset-note {
-            margin-top: 12px;
+        .preset-note, .small-note {
             color: #8193aa;
             font-size: 12px;
             line-height: 1.6;
+            margin-top: 15px;
         }
 
         .evaluate-row {
@@ -174,15 +149,8 @@
             flex-wrap: wrap;
         }
 
-        #evaluateButton {
-            min-width: 190px;
-            padding: 13px 20px;
-        }
-
-        #statusMessage {
-            font-size: 13px;
-            color: #94a3b8;
-        }
+        #evaluateButton { min-width: 190px; padding: 13px 20px; }
+        #statusMessage { font-size: 13px; color: #94a3b8; }
 
         #errorMessage {
             display: none;
@@ -202,35 +170,94 @@
             gap: 15px;
         }
 
-        .metric-card {
+        .metric-card, .countdown-card, .position-card {
             background: #0b111b;
             border: 1px solid #263344;
             border-radius: 9px;
             padding: 17px;
-            min-height: 115px;
         }
 
-        .metric-title {
+        .metric-card { min-height: 115px; }
+
+        .metric-title, .countdown-title, .position-label {
             color: #9aabc0;
             font-size: 13px;
             margin-bottom: 13px;
         }
 
-        .metric-value {
+        .metric-value, .position-value {
             font-size: 24px;
             font-weight: bold;
             color: #fff;
         }
 
-        .metric-description {
+        .metric-description, .position-unit {
             font-size: 11px;
             color: #788ba3;
             margin-top: 8px;
         }
 
-        .timeline-section {
-            overflow: hidden;
+        .countdown-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
         }
+
+        .countdown-card { min-height: 125px; padding: 20px; }
+        .countdown-card.sunset { border-top: 3px solid #eab308; }
+        .countdown-card.earthset { border-top: 3px solid #3b82f6; }
+
+        .countdown-value {
+            color: #fff;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .countdown-description {
+            color: #8193aa;
+            font-size: 11px;
+            margin-top: 9px;
+            line-height: 1.5;
+        }
+
+        .position-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .position-heading h3 { font-size: 15px; margin-bottom: 6px; }
+        .position-heading p { color: #8193aa; font-size: 12px; }
+        .position-time { max-width: 340px; }
+
+        .position-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .position-card { min-height: 120px; padding: 18px; }
+        .sun-position { border-top: 3px solid #eab308; }
+        .earth-position { border-top: 3px solid #3b82f6; }
+
+        .source-info {
+            margin-top: 18px;
+            padding: 14px;
+            background: #0b111b;
+            border: 1px solid #263344;
+            border-radius: 8px;
+            color: #94a3b8;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .source-info a { color: #60a5fa; text-decoration: none; }
+        .source-info a:hover { text-decoration: underline; }
+
+        .timeline-section { overflow: hidden; }
 
         .timeline-legend {
             display: flex;
@@ -241,29 +268,11 @@
             font-size: 13px;
         }
 
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .legend-color {
-            width: 13px;
-            height: 13px;
-            border-radius: 3px;
-        }
-
-        .solar-color {
-            background: #eab308;
-        }
-
-        .earth-color {
-            background: #3b82f6;
-        }
-
-        .unavailable-color {
-            background: #293548;
-        }
+        .legend-item { display: flex; align-items: center; gap: 8px; }
+        .legend-color { width: 13px; height: 13px; border-radius: 3px; }
+        .solar-color { background: #eab308; }
+        .earth-color { background: #3b82f6; }
+        .unavailable-color { background: #293548; }
 
         .timeline-container {
             background: #0a101a;
@@ -299,30 +308,12 @@
             position: absolute;
             top: 0;
             height: 100%;
-            cursor: pointer;
             border: 1px solid rgba(255,255,255,0.15);
-            transition: filter 0.2s;
             min-width: 2px;
         }
 
-        .timeline-interval:hover {
-            filter: brightness(1.3);
-            outline: 2px solid white;
-            z-index: 2;
-        }
-
-        .timeline-interval.solar {
-            background: #d9a400;
-        }
-
-        .timeline-interval.earth {
-            background: #2876d8;
-        }
-
-        .timeline-interval.selected {
-            outline: 2px solid white;
-            z-index: 3;
-        }
+        .timeline-interval.solar { background: #d9a400; }
+        .timeline-interval.earth { background: #2876d8; }
 
         .timeline-axis {
             display: grid;
@@ -335,6 +326,7 @@
             justify-content: space-between;
             color: #8193aa;
             font-size: 11px;
+            gap: 5px;
         }
 
         .timeline-empty {
@@ -344,42 +336,120 @@
             text-align: center;
         }
 
-        .timeline-details {
-            margin-top: 20px;
-            background: #0b111b;
-            border: 1px solid #34445b;
-            border-radius: 9px;
-            padding: 18px;
+        /* PERMANENT AVAILABILITY TABS */
+
+        .availability-tabs {
+            display: flex;
+            gap: 10px;
+            margin-top: 22px;
+            border-bottom: 1px solid #34445b;
+            flex-wrap: wrap;
+        }
+
+        .availability-tab {
+            background: transparent;
+            color: #94a3b8;
+            border: 1px solid transparent;
+            border-bottom: 3px solid transparent;
+            border-radius: 6px 6px 0 0;
+            padding: 13px 18px;
+            margin-bottom: -1px;
+        }
+
+        .availability-tab:hover {
+            background: #172334;
+            color: #fff;
+        }
+
+        .availability-tab.active {
+            background: #172334;
+            color: #fff;
+            border-color: #34445b;
+            border-bottom-color: #3b82f6;
+        }
+
+        .availability-panel {
             display: none;
+            padding-top: 22px;
         }
 
-        .timeline-details h3 {
-            font-size: 16px;
-            margin-bottom: 15px;
-        }
+        .availability-panel.active { display: block; }
 
-        .detail-grid {
+        .availability-summary {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 12px;
             margin-bottom: 20px;
         }
 
-        .detail-item {
-            background: #121d2b;
-            padding: 12px;
-            border-radius: 6px;
+        .availability-summary-card {
+            background: #0b111b;
+            border: 1px solid #263344;
+            border-radius: 8px;
+            padding: 15px;
         }
 
-        .detail-item span {
+        .availability-summary-card span {
+            display: block;
+            color: #8da0b8;
+            font-size: 12px;
+            margin-bottom: 9px;
+        }
+
+        .availability-summary-card strong {
+            font-size: 18px;
+            color: #fff;
+        }
+
+        .availability-intervals {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        .availability-interval-card {
+            background: #0b111b;
+            border: 1px solid #263344;
+            border-left: 4px solid #eab308;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .availability-interval-card.earth {
+            border-left-color: #3b82f6;
+        }
+
+        .availability-interval-card h4 {
+            font-size: 14px;
+            margin-bottom: 12px;
+            color: #e8edf5;
+        }
+
+        .availability-interval-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .availability-interval-grid span {
             display: block;
             color: #8da0b8;
             font-size: 11px;
-            margin-bottom: 7px;
+            margin-bottom: 6px;
         }
 
-        .detail-item strong {
-            font-size: 14px;
+        .availability-interval-grid strong {
+            font-size: 13px;
+            overflow-wrap: anywhere;
+        }
+
+        .availability-empty {
+            color: #94a3b8;
+            background: #0b111b;
+            border: 1px solid #263344;
+            border-radius: 8px;
+            padding: 18px;
+            font-size: 13px;
         }
 
         .chart-container {
@@ -388,6 +458,92 @@
             margin-top: 15px;
         }
 
+        .temporal-controls {
+            background: #0b111b;
+            border: 1px solid #263344;
+            border-radius: 9px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .temporal-time {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            color: #cbd5e1;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        .temporal-time strong { color: #fff; }
+
+        .temporal-slider {
+            width: 100%;
+            accent-color: #3b82f6;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .temporal-buttons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+
+        .temporal-buttons button { min-width: 85px; }
+
+        .temporal-speed {
+            width: 130px;
+            margin-left: auto;
+        }
+
+        .temporal-progress {
+            height: 6px;
+            background: #263344;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 18px;
+        }
+
+        .temporal-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: #3b82f6;
+            transition: width 0.1s linear;
+        }
+
+        .temporal-status {
+            color: #94a3b8;
+            font-size: 12px;
+            margin-top: 12px;
+        }
+
+        .temporal-chart-container {
+            position: relative;
+            height: 370px;
+            background: #0b111b;
+            border: 1px solid #263344;
+            border-radius: 9px;
+            padding: 15px;
+        }
+
+        .temporal-legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+            font-size: 12px;
+            color: #aab8ca;
+        }
+
+        .temporal-legend span { display: flex; align-items: center; gap: 7px; }
+        .temporal-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; }
+        .temporal-sun-dot { background: #eab308; }
+        .temporal-earth-dot { background: #3b82f6; }
+
         .feasibility-card {
             background: #0b111b;
             border: 1px solid #263344;
@@ -395,30 +551,15 @@
             padding: 20px;
         }
 
-        #feasibilityRating {
-            font-size: 21px;
-            margin-bottom: 10px;
-        }
+        #feasibilityRating { font-size: 21px; margin-bottom: 10px; }
 
-        #feasibilitySummary {
+        #feasibilitySummary, #feasibilityReasons {
             color: #aab8ca;
             font-size: 13px;
             line-height: 1.6;
         }
 
-        #feasibilityReasons {
-            margin: 12px 0 0 20px;
-            color: #aab8ca;
-            font-size: 13px;
-            line-height: 1.8;
-        }
-
-        .small-note {
-            color: #7e91a9;
-            font-size: 11px;
-            line-height: 1.6;
-            margin-top: 15px;
-        }
+        #feasibilityReasons { margin: 12px 0 0 20px; line-height: 1.8; }
 
         footer {
             text-align: center;
@@ -429,36 +570,29 @@
         }
 
         @media (max-width: 950px) {
-            .mission-grid,
-            .preset-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .metrics-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
+            .mission-grid, .preset-container { grid-template-columns: repeat(2, 1fr); }
+            .metrics-grid, .position-grid { grid-template-columns: repeat(2, 1fr); }
         }
 
         @media (max-width: 600px) {
-            main {
-                width: 95%;
-            }
+            main { width: 95%; }
+            .section { padding: 15px; }
 
-            .section {
-                padding: 15px;
-            }
-
-            .mission-grid,
-            .preset-container,
-            .metrics-grid,
-            .detail-grid {
+            .mission-grid, .preset-container, .date-grid,
+            .metrics-grid, .countdown-grid, .position-grid,
+            .availability-summary, .availability-interval-grid {
                 grid-template-columns: 1fr;
             }
 
-            .timeline-row,
-            .timeline-axis {
+            .position-time { max-width: none; width: 100%; }
+
+            .timeline-row, .timeline-axis {
                 grid-template-columns: 115px minmax(400px, 1fr);
             }
+
+            .temporal-chart-container { height: 290px; }
+            .temporal-speed { width: 100%; margin-left: 0; }
+            .availability-tab { flex: 1; padding: 12px 8px; font-size: 12px; }
         }
     </style>
 </head>
@@ -474,14 +608,11 @@
 
 <main>
 
-    <!-- MISSION INPUTS -->
-
     <section class="section">
         <h2>Mission Evaluation</h2>
-
         <p class="subtitle">
-            Select a landing site from previous and planned lunar missions,
-            or choose Custom to enter your own coordinates and mission period.
+            Select a landing site and specify the mission start and stop
+            date/time to evaluate solar power and Earth communication availability.
         </p>
 
         <div class="field">
@@ -492,17 +623,11 @@
             </select>
         </div>
 
-        <!-- PRESET LOCATIONS -->
-
         <div id="presetSection">
-
             <div class="preset-container">
-
                 <div class="field">
                     <label for="presetLocation">Select Landing Site</label>
-
                     <select id="presetLocation">
-
                         <optgroup label="Past Apollo Missions">
                             <option value="apollo11">Apollo 11 - Sea of Tranquility</option>
                             <option value="apollo12">Apollo 12 - Ocean of Storms</option>
@@ -511,20 +636,17 @@
                             <option value="apollo16">Apollo 16 - Descartes Highlands</option>
                             <option value="apollo17">Apollo 17 - Taurus-Littrow</option>
                         </optgroup>
-
                         <optgroup label="NASA CLPS Mission Targets">
                             <option value="clps_reiner">IM-3 - Reiner Gamma</option>
                             <option value="clps_schrodinger">Blue Ghost Mission 2 - Schrödinger Basin</option>
                             <option value="clps_mons">Griffin Mission - South Pole Region</option>
                         </optgroup>
-
                         <optgroup label="Other Commercial Lunar Missions">
                             <option value="im1_malapert">IM-1 - Malapert A Region</option>
                             <option value="im2_mons">IM-2 - Mons Mouton Region</option>
                             <option value="hakuto1_atlas">HAKUTO-R Mission 1 - Atlas Crater</option>
                             <option value="hakuto2_mare">HAKUTO-R Mission 2 - Mare Frigoris Region</option>
                         </optgroup>
-
                         <optgroup label="Other Countries' Lunar Programs">
                             <option value="chang3">China - Chang'e 3</option>
                             <option value="chang4">China - Chang'e 4</option>
@@ -533,28 +655,13 @@
                             <option value="chandrayaan3">India - Chandrayaan-3</option>
                             <option value="luna9">Soviet Union - Luna 9</option>
                         </optgroup>
-
                     </select>
                 </div>
-
-                <div class="field">
-                    <label>Mission Evaluation Period</label>
-                    <div class="site-info" style="margin-top:0">
-                        <h3>Default Evaluation</h3>
-                        <p>
-                            Start time: Current date and time<br>
-                            Mission duration: 72 hours
-                        </p>
-                    </div>
-                </div>
-
             </div>
 
             <div class="site-info">
                 <h3 id="siteName">Apollo 11 - Sea of Tranquility</h3>
-                <p id="siteDescription">
-                    First crewed Moon landing site.
-                </p>
+                <p id="siteDescription">First crewed Moon landing site.</p>
                 <p id="siteCoordinates"></p>
             </div>
 
@@ -563,280 +670,337 @@
                 targets are planned or approximate and may change. The evaluation
                 uses the coordinates shown above.
             </p>
-
         </div>
 
-        <!-- CUSTOM INPUTS -->
-
         <div class="custom-fields" id="customSection">
-
-            <h3 style="font-size:15px; margin-bottom:15px;">
-                Custom Mission Parameters
-            </h3>
-
+            <h3 style="font-size:15px; margin-bottom:15px;">Custom Location Parameters</h3>
             <div class="mission-grid">
-
                 <div class="field">
                     <label for="latitude">Lunar Latitude (degrees)</label>
-                    <input
-                        type="number"
-                        id="latitude"
-                        min="-90"
-                        max="90"
-                        step="any"
-                        value="-89.5"
-                    >
+                    <input type="number" id="latitude" min="-90" max="90" step="any" value="-89.5">
                 </div>
-
                 <div class="field">
                     <label for="longitude">Lunar Longitude (degrees)</label>
-                    <input
-                        type="number"
-                        id="longitude"
-                        min="-180"
-                        max="360"
-                        step="any"
-                        value="0"
-                    >
+                    <input type="number" id="longitude" min="-180" max="360" step="any" value="0">
                 </div>
+            </div>
+        </div>
 
-                <div class="field">
-                    <label for="startDateTime">Mission Start Date and Time</label>
-                    <input
-                        type="datetime-local"
-                        id="startDateTime"
-                    >
-                </div>
-
-                <div class="field">
-                    <label for="duration">Mission Duration (hours)</label>
-                    <input
-                        type="number"
-                        id="duration"
-                        min="1"
-                        max="168"
-                        value="72"
-                    >
-                </div>
-
+        <div class="date-grid">
+            <div class="field">
+                <label for="startDateTime">Mission Start Date and Time</label>
+                <input type="datetime-local" id="startDateTime" required>
+            </div>
+            <div class="field">
+                <label for="stopDateTime">Mission Stop Date and Time</label>
+                <input type="datetime-local" id="stopDateTime" required>
             </div>
         </div>
 
         <div class="evaluate-row">
-            <button id="evaluateButton">
-                Evaluate Mission
-            </button>
-
-            <span id="statusMessage">
-                Select a landing site to begin.
-            </span>
+            <button id="evaluateButton">Evaluate Mission</button>
+            <span id="statusMessage">Select a landing site to begin.</span>
         </div>
-
         <div id="errorMessage"></div>
     </section>
 
-
-    <!-- METRICS -->
-
     <section class="section">
         <h2>Mission Assessment Metrics</h2>
-
-        <p class="subtitle">
-            Results from the selected location and mission period.
-        </p>
+        <p class="subtitle">Results from the selected location and mission evaluation period.</p>
 
         <div class="metrics-grid">
-
             <div class="metric-card">
                 <div class="metric-title">Maximum Solar Elevation</div>
                 <div class="metric-value" id="solarElevation">--</div>
-                <div class="metric-description">
-                    Highest sampled Sun elevation above the horizon
-                </div>
+                <div class="metric-description">Highest sampled Sun elevation above the horizon</div>
             </div>
-
             <div class="metric-card">
                 <div class="metric-title">Duration of Sunlight</div>
                 <div class="metric-value" id="sunlightHours">--</div>
-                <div class="metric-description">
-                    Total estimated sunlight availability
-                </div>
+                <div class="metric-description">Total estimated sunlight availability</div>
             </div>
-
-            <div class="metric-card">
-                <div class="metric-title">Solar Power Efficiency</div>
-                <div class="metric-value" id="solarEfficiency">--</div>
-                <div class="metric-description">
-                    Horizontal-panel geometric efficiency proxy
-                </div>
-            </div>
-
             <div class="metric-card">
                 <div class="metric-title">Sun Visibility</div>
                 <div class="metric-value" id="sunVisibility">--</div>
-                <div class="metric-description">
-                    Whether sunlight was sampled above the horizon
-                </div>
+                <div class="metric-description">Whether sunlight was sampled above the horizon</div>
             </div>
-
             <div class="metric-card">
                 <div class="metric-title">Earth Visibility</div>
                 <div class="metric-value" id="earthVisibility">--</div>
-                <div class="metric-description">
-                    Whether Earth was sampled above the horizon
-                </div>
+                <div class="metric-description">Whether Earth was sampled above the horizon</div>
             </div>
-
             <div class="metric-card">
                 <div class="metric-title">Communication Availability</div>
                 <div class="metric-value" id="communicationHours">--</div>
-                <div class="metric-description">
-                    Total estimated direct Earth visibility duration
-                </div>
+                <div class="metric-description">Total estimated direct Earth visibility duration</div>
             </div>
-
         </div>
     </section>
 
+    <section class="section">
+        <h2>Event Countdown</h2>
+        <p class="subtitle">
+            Estimated time remaining until the next sunset or Earthset
+            at the selected lunar location, based on the selected mission time.
+        </p>
 
-    <!-- AVAILABILITY TIMELINE -->
+        <div class="countdown-grid">
+            <div class="countdown-card sunset">
+                <div class="countdown-title">Time Until Next Sunset</div>
+                <div class="countdown-value" id="sunsetCountdown">--</div>
+                <div class="countdown-description" id="sunsetEventTime">Waiting for mission evaluation.</div>
+            </div>
+            <div class="countdown-card earthset">
+                <div class="countdown-title">Time Until Next Earthset</div>
+                <div class="countdown-value" id="earthsetCountdown">--</div>
+                <div class="countdown-description" id="earthsetEventTime">Waiting for mission evaluation.</div>
+            </div>
+        </div>
+
+        <p class="small-note">
+            Countdown values are calculated from the selected mission timeline
+            sample. Event times are estimated by interpolation between
+            available JPL Horizons samples. Accuracy depends on sampling interval.
+        </p>
+    </section>
+
+    <section class="section">
+        <h2>JPL Horizons Position Data</h2>
+        <p class="subtitle">
+            Apparent Sun and Earth positions as observed from your selected
+            lunar surface location.
+        </p>
+
+        <div class="position-heading">
+            <div>
+                <h3>Position Sample</h3>
+                <p id="positionSampleTime">Run mission evaluation to load JPL position data.</p>
+            </div>
+            <div class="position-time">
+                <label for="positionTimeSelect">Select Sample Time</label>
+                <select id="positionTimeSelect" disabled>
+                    <option value="">No samples available</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="position-grid">
+            <div class="position-card sun-position">
+                <div class="position-label">Sun Azimuth</div>
+                <div class="position-value" id="sunAzimuth">--</div>
+                <div class="position-unit">Degrees</div>
+            </div>
+            <div class="position-card sun-position">
+                <div class="position-label">Sun Elevation</div>
+                <div class="position-value" id="sunElevation">--</div>
+                <div class="position-unit">Degrees above or below horizon</div>
+            </div>
+            <div class="position-card earth-position">
+                <div class="position-label">Earth Azimuth</div>
+                <div class="position-value" id="earthAzimuth">--</div>
+                <div class="position-unit">Degrees</div>
+            </div>
+            <div class="position-card earth-position">
+                <div class="position-label">Earth Elevation</div>
+                <div class="position-value" id="earthElevation">--</div>
+                <div class="position-unit">Degrees above or below horizon</div>
+            </div>
+        </div>
+
+        <div class="source-info">
+            <strong>Data source:</strong>
+            <a href="https://ssd.jpl.nasa.gov/horizons/" target="_blank" rel="noopener noreferrer">
+                NASA/JPL Horizons System
+            </a>
+            <br><strong>Observer:</strong> Selected lunar surface coordinates
+            <br><strong>Sampling interval:</strong> 30 minutes
+            <br><strong>Position type:</strong> Apparent azimuth and elevation
+            <br><strong>Selected sample:</strong> <span id="positionSampleNumber">--</span>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Temporal Dynamics</h2>
+        <p class="subtitle">
+            Animate the movement of the Sun and Earth throughout the
+            selected mission period using JPL Horizons position samples.
+        </p>
+
+        <div class="temporal-controls">
+            <div class="temporal-time">
+                <span>Mission timeline</span>
+                <strong id="animationTime">Waiting for mission data</strong>
+            </div>
+
+            <input type="range" id="timeSlider" class="temporal-slider"
+                min="0" max="0" value="0" step="1" disabled>
+
+            <div class="temporal-buttons">
+                <button id="playButton" disabled>Play</button>
+                <button id="previousButton" disabled>Previous</button>
+                <button id="nextButton" disabled>Next</button>
+                <button id="resetButton" disabled>Reset</button>
+
+                <div class="temporal-speed">
+                    <label for="animationSpeed">Playback Speed</label>
+                    <select id="animationSpeed">
+                        <option value="0.5">0.5x</option>
+                        <option value="1" selected>1x</option>
+                        <option value="2">2x</option>
+                        <option value="4">4x</option>
+                        <option value="8">8x</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="temporal-progress">
+                <div class="temporal-progress-bar" id="animationProgress"></div>
+            </div>
+            <p class="temporal-status" id="animationStatus">Run mission evaluation to start the animation.</p>
+        </div>
+
+        <h3 style="font-size:15px; margin-bottom:14px;">Sun and Earth Elevation Over Time</h3>
+
+        <div class="temporal-legend">
+            <span><i class="temporal-sun-dot"></i> Sun elevation</span>
+            <span><i class="temporal-earth-dot"></i> Earth elevation</span>
+        </div>
+
+        <div class="temporal-chart-container">
+            <canvas id="temporalChart"></canvas>
+        </div>
+
+        <p class="small-note">
+            Each animation step represents one JPL Horizons sample.
+            The default sampling interval is 30 minutes. Positive elevation
+            indicates geometric visibility above the horizon.
+        </p>
+    </section>
 
     <section class="section timeline-section">
-
         <h2>Mission Availability Timeline</h2>
-
         <p class="subtitle">
             View when solar power and direct Earth communication are available
-            during your selected mission period. Select an interval to view details.
+            during the selected mission period.
         </p>
 
         <div class="timeline-legend">
-
-            <div class="legend-item">
-                <span class="legend-color solar-color"></span>
-                Solar availability
-            </div>
-
-            <div class="legend-item">
-                <span class="legend-color earth-color"></span>
-                Direct Earth communication
-            </div>
-
-            <div class="legend-item">
-                <span class="legend-color unavailable-color"></span>
-                Unavailable
-            </div>
-
+            <div class="legend-item"><span class="legend-color solar-color"></span>Solar availability</div>
+            <div class="legend-item"><span class="legend-color earth-color"></span>Direct Earth communication</div>
+            <div class="legend-item"><span class="legend-color unavailable-color"></span>Unavailable</div>
         </div>
 
         <div class="timeline-container">
-
             <div class="timeline-row">
                 <div class="timeline-label">Solar Availability</div>
-
                 <div class="timeline-track" id="solarTimeline">
-                    <div class="timeline-empty">
-                        Run mission evaluation to load timeline.
-                    </div>
+                    <div class="timeline-empty">Run mission evaluation to load timeline.</div>
                 </div>
             </div>
 
             <div class="timeline-row">
                 <div class="timeline-label">Earth Communication</div>
-
                 <div class="timeline-track" id="earthTimeline">
-                    <div class="timeline-empty">
-                        Waiting for mission data.
-                    </div>
+                    <div class="timeline-empty">Waiting for mission data.</div>
                 </div>
             </div>
 
             <div class="timeline-axis">
                 <div></div>
-
                 <div class="axis-labels" id="timelineAxis">
-                    <span>Start</span>
-                    <span>25%</span>
-                    <span>50%</span>
-                    <span>75%</span>
-                    <span>End</span>
+                    <span>Start</span><span>25%</span><span>50%</span><span>75%</span><span>End</span>
                 </div>
             </div>
-
         </div>
 
-        <div class="timeline-details" id="timelineDetails">
+        <!-- PERMANENT TABS -->
+        <div class="availability-tabs" role="tablist" aria-label="Availability details">
+            <button class="availability-tab active" id="solarTab"
+                role="tab" aria-selected="true" aria-controls="solarPanel"
+                data-tab="solarPanel">
+                Solar Availability Details
+            </button>
 
-            <h3 id="detailTitle">Selected Interval</h3>
+            <button class="availability-tab" id="earthTab"
+                role="tab" aria-selected="false" aria-controls="earthPanel"
+                data-tab="earthPanel">
+                Direct Earth Communication Details
+            </button>
+        </div>
 
-            <div class="detail-grid">
+        <!-- SOLAR TAB -->
+        <div class="availability-panel active" id="solarPanel" role="tabpanel" aria-labelledby="solarTab">
+            <h3 style="font-size:16px; margin-bottom:15px;">Solar Availability Summary</h3>
 
-                <div class="detail-item">
-                    <span>Start Time</span>
-                    <strong id="detailStart">--</strong>
+            <div class="availability-summary">
+                <div class="availability-summary-card">
+                    <span>Total Sunlight Duration</span>
+                    <strong id="solarTotalDuration">--</strong>
                 </div>
-
-                <div class="detail-item">
-                    <span>End Time</span>
-                    <strong id="detailEnd">--</strong>
+                <div class="availability-summary-card">
+                    <span>Number of Sunlight Periods</span>
+                    <strong id="solarIntervalCount">--</strong>
                 </div>
-
-                <div class="detail-item">
-                    <span>Duration</span>
-                    <strong id="detailDuration">--</strong>
+                <div class="availability-summary-card">
+                    <span>Maximum Solar Elevation</span>
+                    <strong id="solarMaximumElevation">--</strong>
                 </div>
-
-                <div class="detail-item">
-                    <span>Maximum Elevation</span>
-                    <strong id="detailMaximum">--</strong>
-                </div>
-
-                <div class="detail-item">
-                    <span>Mean Elevation</span>
-                    <strong id="detailMean">--</strong>
-                </div>
-
-                <div class="detail-item">
-                    <span>Availability Type</span>
-                    <strong id="detailType">--</strong>
-                </div>
-
             </div>
 
-            <h3>Elevation Graph</h3>
+            <h3 style="font-size:15px; margin-bottom:12px;">Sunlight Intervals</h3>
+            <div class="availability-intervals" id="solarIntervalsList">
+                <div class="availability-empty">Run mission evaluation to display solar availability details.</div>
+            </div>
 
+            <h3 style="font-size:15px; margin-bottom:10px;">Solar Elevation During Mission</h3>
             <div class="chart-container">
-                <canvas id="intervalChart"></canvas>
+                <canvas id="solarAvailabilityChart"></canvas>
+            </div>
+        </div>
+
+        <!-- EARTH COMMUNICATION TAB -->
+        <div class="availability-panel" id="earthPanel" role="tabpanel" aria-labelledby="earthTab">
+            <h3 style="font-size:16px; margin-bottom:15px;">Direct Earth Communication Summary</h3>
+
+            <div class="availability-summary">
+                <div class="availability-summary-card">
+                    <span>Total Communication Duration</span>
+                    <strong id="earthTotalDuration">--</strong>
+                </div>
+                <div class="availability-summary-card">
+                    <span>Number of Communication Windows</span>
+                    <strong id="earthIntervalCount">--</strong>
+                </div>
+                <div class="availability-summary-card">
+                    <span>Maximum Earth Elevation</span>
+                    <strong id="earthMaximumElevation">--</strong>
+                </div>
             </div>
 
+            <h3 style="font-size:15px; margin-bottom:12px;">Communication Windows</h3>
+            <div class="availability-intervals" id="earthIntervalsList">
+                <div class="availability-empty">Run mission evaluation to display Earth communication details.</div>
+            </div>
+
+            <h3 style="font-size:15px; margin-bottom:10px;">Earth Elevation During Mission</h3>
+            <div class="chart-container">
+                <canvas id="earthAvailabilityChart"></canvas>
+            </div>
         </div>
 
         <p class="small-note">
-            Timeline intervals are based on the sampling resolution returned by
+            Availability intervals are based on the sampling resolution returned by
             the backend. A 30-minute sampling interval means the exact start and
             end of visibility may differ from the displayed boundaries.
         </p>
-
     </section>
-
-
-    <!-- FEASIBILITY -->
 
     <section class="section">
         <h2>Landing Site Feasibility</h2>
-
         <div class="feasibility-card">
-
-            <h3 id="feasibilityRating">
-                Awaiting Mission Evaluation
-            </h3>
-
-            <p id="feasibilitySummary">
-                Select a landing site and evaluate the mission.
-            </p>
-
+            <h3 id="feasibilityRating">Awaiting Mission Evaluation</h3>
+            <p id="feasibilitySummary">Select a landing site and evaluate the mission.</p>
             <ul id="feasibilityReasons"></ul>
-
         </div>
 
         <p class="small-note">
@@ -849,303 +1013,118 @@
 
 </main>
 
-<footer>
-    NASA Moon Explorer | Lunar Mission Planning
-</footer>
-
+<footer>NASA Moon Explorer | Lunar Mission Planning</footer>
 
 <script>
-
-    // --------------------------------------------------
     // GLOBAL VARIABLES
-    // --------------------------------------------------
-
     let missionData = null;
-    let intervalChart = null;
-    let selectedIntervalElement = null;
+    let temporalChart = null;
+    let solarAvailabilityChart = null;
+    let earthAvailabilityChart = null;
+    let currentSampleIndex = 0;
+    let animationTimer = null;
 
     const API_URL = "/api/missions/evaluate/";
-
     const $ = (id) => document.getElementById(id);
 
+    // DATE INITIALIZATION
+    function getLocalDateTimeValue(date) {
+        const offset = date.getTimezoneOffset() * 60000;
+        return new Date(date.getTime() - offset).toISOString().slice(0, 16);
+    }
 
-    // --------------------------------------------------
-    // PRESET LANDING SITE DATA
-    // Coordinates are latitude and east longitude.
-    // Some planned targets are approximate.
-    // --------------------------------------------------
+    function initializeMissionDates() {
+        const now = new Date();
+        const stop = new Date(now);
+        stop.setDate(stop.getDate() + 7);
 
+        $("startDateTime").value = getLocalDateTimeValue(now);
+        $("stopDateTime").value = getLocalDateTimeValue(stop);
+        $("stopDateTime").min = $("startDateTime").value;
+    }
+
+    $("startDateTime").addEventListener("change", function() {
+        $("stopDateTime").min = this.value;
+    });
+
+    initializeMissionDates();
+
+    // PRESET LANDING SITES
     const landingSites = {
-
-        apollo11: {
-            name: "Apollo 11 - Sea of Tranquility",
-            latitude: 0.674,
-            longitude: 23.473,
-            description: "United States. First crewed Moon landing, July 1969."
-        },
-
-        apollo12: {
-            name: "Apollo 12 - Ocean of Storms",
-            latitude: -3.012,
-            longitude: -23.421,
-            description: "United States. Second crewed lunar landing, November 1969."
-        },
-
-        apollo14: {
-            name: "Apollo 14 - Fra Mauro",
-            latitude: -3.645,
-            longitude: -17.471,
-            description: "United States. Third crewed lunar landing, February 1971."
-        },
-
-        apollo15: {
-            name: "Apollo 15 - Hadley-Apennine",
-            latitude: 26.132,
-            longitude: 3.634,
-            description: "United States. Fourth crewed lunar landing, July 1971."
-        },
-
-        apollo16: {
-            name: "Apollo 16 - Descartes Highlands",
-            latitude: -8.973,
-            longitude: 15.501,
-            description: "United States. Fifth crewed lunar landing, April 1972."
-        },
-
-        apollo17: {
-            name: "Apollo 17 - Taurus-Littrow",
-            latitude: 20.190,
-            longitude: 30.772,
-            description: "United States. Sixth crewed lunar landing, December 1972."
-        },
-
-        clps_reiner: {
-            name: "IM-3 - Reiner Gamma",
-            latitude: 7.5,
-            longitude: -59.1,
-            description: "NASA CLPS mission target associated with Intuitive Machines IM-3. Planned target; verify current mission plans."
-        },
-
-        clps_schrodinger: {
-            name: "Blue Ghost Mission 2 - Schrödinger Basin",
-            latitude: -75.0,
-            longitude: 132.4,
-            description: "Planned commercial lunar mission target associated with Firefly Blue Ghost Mission 2. Approximate reference coordinates."
-        },
-
-        clps_mons: {
-            name: "Griffin Mission - South Pole Region",
-            latitude: -84.0,
-            longitude: 28.0,
-            description: "Approximate south-polar reference location for the Griffin mission. Confirm the latest landing target before scientific use."
-        },
-
-        im1_malapert: {
-            name: "IM-1 - Malapert A Region",
-            latitude: -80.13,
-            longitude: -1.44,
-            description: "Intuitive Machines IM-1 Odysseus landing region, February 2024. Approximate location."
-        },
-
-        im2_mons: {
-            name: "IM-2 - Mons Mouton Region",
-            latitude: -84.0,
-            longitude: 25.0,
-            description: "Intuitive Machines IM-2 Athena landing region, March 2025. Approximate reference coordinates."
-        },
-
-        hakuto1_atlas: {
-            name: "HAKUTO-R Mission 1 - Atlas Crater",
-            latitude: 47.5,
-            longitude: 44.4,
-            description: "ispace commercial lunar landing attempt target in 2023. The landing attempt was unsuccessful."
-        },
-
-        hakuto2_mare: {
-            name: "HAKUTO-R Mission 2 - Mare Frigoris Region",
-            latitude: 60.5,
-            longitude: 4.6,
-            description: "ispace commercial lunar mission target. Approximate reference coordinates; verify mission outcome and target details."
-        },
-
-        chang3: {
-            name: "China - Chang'e 3",
-            latitude: 44.12,
-            longitude: -340.49 + 360,
-            description: "China. Robotic landing in Mare Imbrium, December 2013."
-        },
-
-        chang4: {
-            name: "China - Chang'e 4",
-            latitude: -45.46,
-            longitude: 177.59,
-            description: "China. First successful soft landing on the lunar far side, January 2019."
-        },
-
-        chang5: {
-            name: "China - Chang'e 5",
-            latitude: 43.06,
-            longitude: -51.92,
-            description: "China. Sample-return mission landing site in December 2020."
-        },
-
-        chang6: {
-            name: "China - Chang'e 6",
-            latitude: -41.64,
-            longitude: 153.99,
-            description: "China. Far-side sample-return mission landing region in Apollo Basin, June 2024."
-        },
-
-        chandrayaan3: {
-            name: "India - Chandrayaan-3",
-            latitude: -69.37,
-            longitude: 32.35,
-            description: "India. Vikram lander touchdown region near the lunar south pole, August 2023."
-        },
-
-        luna9: {
-            name: "Soviet Union - Luna 9",
-            latitude: 7.08,
-            longitude: -64.37,
-            description: "Soviet Union. First successful soft landing on the Moon, February 1966."
-        }
+        apollo11: { name: "Apollo 11 - Sea of Tranquility", latitude: 0.674, longitude: 23.473, description: "United States. First crewed Moon landing, July 1969." },
+        apollo12: { name: "Apollo 12 - Ocean of Storms", latitude: -3.012, longitude: -23.421, description: "United States. Second crewed lunar landing, November 1969." },
+        apollo14: { name: "Apollo 14 - Fra Mauro", latitude: -3.645, longitude: -17.471, description: "United States. Third crewed lunar landing, February 1971." },
+        apollo15: { name: "Apollo 15 - Hadley-Apennine", latitude: 26.132, longitude: 3.634, description: "United States. Fourth crewed lunar landing, July 1971." },
+        apollo16: { name: "Apollo 16 - Descartes Highlands", latitude: -8.973, longitude: 15.501, description: "United States. Fifth crewed lunar landing, April 1972." },
+        apollo17: { name: "Apollo 17 - Taurus-Littrow", latitude: 20.190, longitude: 30.772, description: "United States. Sixth crewed lunar landing, December 1972." },
+        clps_reiner: { name: "IM-3 - Reiner Gamma", latitude: 7.5, longitude: -59.1, description: "NASA CLPS mission target associated with Intuitive Machines IM-3. Planned target; verify current mission plans." },
+        clps_schrodinger: { name: "Blue Ghost Mission 2 - Schrödinger Basin", latitude: -75.0, longitude: 132.4, description: "Planned commercial lunar mission target associated with Firefly Blue Ghost Mission 2. Approximate reference coordinates." },
+        clps_mons: { name: "Griffin Mission - South Pole Region", latitude: -84.0, longitude: 28.0, description: "Approximate south-polar reference location for the Griffin mission. Confirm the latest landing target before scientific use." },
+        im1_malapert: { name: "IM-1 - Malapert A Region", latitude: -80.13, longitude: -1.44, description: "Intuitive Machines IM-1 Odysseus landing region, February 2024. Approximate location." },
+        im2_mons: { name: "IM-2 - Mons Mouton Region", latitude: -84.0, longitude: 25.0, description: "Intuitive Machines IM-2 Athena landing region, March 2025. Approximate reference coordinates." },
+        hakuto1_atlas: { name: "HAKUTO-R Mission 1 - Atlas Crater", latitude: 47.5, longitude: 44.4, description: "ispace commercial lunar landing attempt target in 2023. The landing attempt was unsuccessful." },
+        hakuto2_mare: { name: "HAKUTO-R Mission 2 - Mare Frigoris Region", latitude: 60.5, longitude: 4.6, description: "ispace commercial lunar mission target. Approximate reference coordinates; verify mission outcome and target details." },
+        chang3: { name: "China - Chang'e 3", latitude: 44.12, longitude: 19.51, description: "China. Robotic landing in Mare Imbrium, December 2013." },
+        chang4: { name: "China - Chang'e 4", latitude: -45.46, longitude: 177.59, description: "China. First successful soft landing on the lunar far side, January 2019." },
+        chang5: { name: "China - Chang'e 5", latitude: 43.06, longitude: -51.92, description: "China. Sample-return mission landing site in December 2020." },
+        chang6: { name: "China - Chang'e 6", latitude: -41.64, longitude: 153.99, description: "China. Far-side sample-return mission landing region in Apollo Basin, June 2024." },
+        chandrayaan3: { name: "India - Chandrayaan-3", latitude: -69.37, longitude: 32.35, description: "India. Vikram lander touchdown region near the lunar south pole, August 2023." },
+        luna9: { name: "Soviet Union - Luna 9", latitude: 7.08, longitude: -64.37, description: "Soviet Union. First successful soft landing on the Moon, February 1966." }
     };
 
-
-    // --------------------------------------------------
-    // DATE AND TIME
-    // --------------------------------------------------
-
-    function getCurrentLocalDateTime() {
-
-        const now = new Date();
-
-        const localDate = new Date(
-            now.getTime() - now.getTimezoneOffset() * 60000
-        );
-
-        return localDate.toISOString().slice(0, 16);
-    }
-
-    function setDefaultDateTime() {
-        $("startDateTime").value = getCurrentLocalDateTime();
-    }
-
-    setDefaultDateTime();
-
-
-    // --------------------------------------------------
     // LOCATION MODE
-    // --------------------------------------------------
-
     function updateLocationMode() {
-
         const mode = $("locationMode").value;
 
         if (mode === "custom") {
-
             $("presetSection").style.display = "none";
             $("customSection").style.display = "block";
-
-            $("statusMessage").textContent =
-                "Enter your custom mission parameters.";
-
+            $("statusMessage").textContent = "Enter your custom lunar coordinates.";
         } else {
-
             $("presetSection").style.display = "block";
             $("customSection").style.display = "none";
-
-            $("statusMessage").textContent =
-                "Select a preset landing site.";
+            $("statusMessage").textContent = "Select a preset landing site.";
         }
-
     }
 
-    $("locationMode").addEventListener(
-        "change",
-        updateLocationMode
-    );
-
-
-    // --------------------------------------------------
-    // PRESET SELECTION
-    // --------------------------------------------------
+    $("locationMode").addEventListener("change", updateLocationMode);
 
     function updatePresetLocation() {
-
-        const selectedId = $("presetLocation").value;
-        const site = landingSites[selectedId];
-
+        const site = landingSites[$("presetLocation").value];
         if (!site) return;
 
         $("siteName").textContent = site.name;
-
-        $("siteDescription").textContent =
-            site.description;
-
+        $("siteDescription").textContent = site.description;
         $("siteCoordinates").textContent =
-            "Latitude: " + site.latitude +
-            "° | East Longitude: " + site.longitude + "°";
+            "Latitude: " + site.latitude + "° | East Longitude: " + site.longitude + "°";
     }
 
-    $("presetLocation").addEventListener(
-        "change",
-        updatePresetLocation
-    );
-
+    $("presetLocation").addEventListener("change", updatePresetLocation);
     updatePresetLocation();
     updateLocationMode();
 
-
-    // --------------------------------------------------
-    // CSRF COOKIE
-    // --------------------------------------------------
-
+    // CSRF
     function getCookie(name) {
-
-        const cookies = document.cookie
-            ? document.cookie.split(";")
-            : [];
+        const cookies = document.cookie ? document.cookie.split(";") : [];
 
         for (let cookie of cookies) {
-
             cookie = cookie.trim();
-
             if (cookie.startsWith(name + "=")) {
-
-                return decodeURIComponent(
-                    cookie.substring(name.length + 1)
-                );
+                return decodeURIComponent(cookie.substring(name.length + 1));
             }
         }
-
         return "";
     }
 
-
-    // --------------------------------------------------
     // MISSION EVALUATION
-    // --------------------------------------------------
-
-    $("evaluateButton").addEventListener(
-        "click",
-        evaluateMission
-    );
-
+    $("evaluateButton").addEventListener("click", evaluateMission);
 
     async function evaluateMission() {
-
         let latitude;
         let longitude;
-        let duration;
-        let startValue;
 
-        const mode = $("locationMode").value;
-
-        if (mode === "preset") {
-
-            const selectedId = $("presetLocation").value;
-            const site = landingSites[selectedId];
+        if ($("locationMode").value === "preset") {
+            const site = landingSites[$("presetLocation").value];
 
             if (!site) {
                 showError("Select a valid landing site.");
@@ -1154,58 +1133,45 @@
 
             latitude = site.latitude;
             longitude = site.longitude;
-
-            duration = 72;
-            startValue = getCurrentLocalDateTime();
-
         } else {
-
             latitude = Number($("latitude").value);
             longitude = Number($("longitude").value);
-            duration = Number($("duration").value);
-            startValue = $("startDateTime").value;
         }
 
         $("errorMessage").style.display = "none";
 
-        if (
-            !Number.isFinite(latitude) ||
-            latitude < -90 ||
-            latitude > 90
-        ) {
+        if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90) {
             showError("Latitude must be between -90 and 90.");
             return;
         }
 
-        if (
-            !Number.isFinite(longitude) ||
-            longitude < -180 ||
-            longitude > 360
-        ) {
+        if (!Number.isFinite(longitude) || longitude < -180 || longitude > 360) {
             showError("Longitude must be between -180 and 360.");
             return;
         }
 
-        if (
-            !Number.isFinite(duration) ||
-            duration < 1 ||
-            duration > 168
-        ) {
-            showError("Mission duration must be between 1 and 168 hours.");
-            return;
-        }
+        const startValue = $("startDateTime").value;
+        const stopValue = $("stopDateTime").value;
 
-        if (!startValue) {
-            showError("Select a mission start date and time.");
+        if (!startValue || !stopValue) {
+            showError("Select both mission start and stop date/time.");
             return;
         }
 
         const startDate = new Date(startValue);
+        const stopDate = new Date(stopValue);
 
-        if (Number.isNaN(startDate.getTime())) {
-            showError("Invalid mission start date.");
+        if (Number.isNaN(startDate.getTime()) || Number.isNaN(stopDate.getTime())) {
+            showError("Enter valid mission dates and times.");
             return;
         }
+
+        if (stopDate <= startDate) {
+            showError("Mission stop date/time must be after the start date/time.");
+            return;
+        }
+
+        const duration = (stopDate.getTime() - startDate.getTime()) / 3600000;
 
         const payload = {
             latitude: latitude,
@@ -1214,153 +1180,509 @@
             duration_hours: duration
         };
 
+        stopAnimation();
         $("evaluateButton").disabled = true;
-
-        $("statusMessage").textContent =
-            "Requesting mission calculations from JPL Horizons...";
-
-        $("evaluateButton").textContent =
-            "Calculating...";
+        $("statusMessage").textContent = "Requesting mission calculations from JPL Horizons...";
+        $("evaluateButton").textContent = "Calculating...";
 
         try {
-
             const response = await fetch(API_URL, {
-
                 method: "POST",
-
                 headers: {
                     "Content-Type": "application/json",
                     "X-CSRFToken": getCookie("csrftoken")
                 },
-
                 body: JSON.stringify(payload)
             });
 
             const data = await response.json();
 
             if (!response.ok) {
-
-                throw new Error(
-                    data.detail || "Mission evaluation failed."
-                );
+                throw new Error(data.detail || "Mission evaluation failed.");
             }
 
             validateMissionResponse(data);
-
             missionData = data;
 
             displayMissionMetrics(data);
+            displayJPLPositions(data);
             displayTimeline(data);
+            displayAvailabilityDetails(data);
             displayFeasibility(data);
 
-            $("statusMessage").textContent =
-                "Mission evaluation completed.";
-
+            $("statusMessage").textContent = "Mission evaluation completed successfully.";
         } catch (error) {
-
             console.error(error);
-
             showError(error.message);
-
-            $("statusMessage").textContent =
-                "Mission evaluation failed.";
-
+            $("statusMessage").textContent = "Mission evaluation failed.";
         } finally {
-
             $("evaluateButton").disabled = false;
-
-            $("evaluateButton").textContent =
-                "Evaluate Mission";
+            $("evaluateButton").textContent = "Evaluate Mission";
         }
     }
-
 
     function validateMissionResponse(data) {
-
         if (
-            !data ||
-            !data.metrics ||
+            !data || !data.metrics ||
             !Array.isArray(data.intervals) ||
             !Array.isArray(data.samples) ||
-            !data.feasibility ||
-            !data.start_time ||
-            !data.end_time
+            !data.feasibility || !data.start_time || !data.end_time
         ) {
-            throw new Error(
-                "The backend returned an incomplete mission response."
-            );
+            throw new Error("The backend returned an incomplete mission response.");
+        }
+
+        if (!data.samples.length) {
+            throw new Error("JPL returned no position samples.");
+        }
+
+        const missionStart = new Date(data.start_time).getTime();
+        const missionEnd = new Date(data.end_time).getTime();
+
+        if (!Number.isFinite(missionStart) || !Number.isFinite(missionEnd) || missionEnd <= missionStart) {
+            throw new Error("The backend returned invalid mission dates.");
+        }
+
+        const numericFields = [
+            "solar_azimuth_deg", "solar_elevation_deg",
+            "earth_azimuth_deg", "earth_elevation_deg"
+        ];
+
+        for (const sample of data.samples) {
+            if (!sample.time || !Number.isFinite(new Date(sample.time).getTime())) {
+                throw new Error("The backend response contains invalid time data.");
+            }
+
+            for (const field of numericFields) {
+                if (
+                    sample[field] === undefined ||
+                    sample[field] === null ||
+                    !Number.isFinite(Number(sample[field]))
+                ) {
+                    throw new Error("The backend response contains invalid " + field + " data.");
+                }
+            }
         }
     }
 
-
     function showError(message) {
-
         $("errorMessage").textContent = message;
-
         $("errorMessage").style.display = "block";
     }
 
-
-    // --------------------------------------------------
-    // DISPLAY METRICS
-    // --------------------------------------------------
-
+    // METRICS
     function displayMissionMetrics(data) {
-
         const metrics = data.metrics;
 
-        $("solarElevation").textContent =
-            formatNumber(metrics.solar_elevation_deg, "°");
-
-        $("sunlightHours").textContent =
-            formatNumber(metrics.sunlight_hours, " hrs");
-
-        $("solarEfficiency").textContent =
-            formatNumber(
-                metrics.solar_power_efficiency_percent,
-                "%"
-            );
-
-        $("sunVisibility").textContent =
-            metrics.sun_visible ? "Available" : "Unavailable";
-
-        $("earthVisibility").textContent =
-            metrics.earth_visible ? "Available" : "Unavailable";
-
-        $("communicationHours").textContent =
-            formatNumber(metrics.communication_hours, " hrs");
+        $("solarElevation").textContent = formatNumber(metrics.solar_elevation_deg, "°");
+        $("sunlightHours").textContent = formatNumber(metrics.sunlight_hours, " hrs");
+        $("sunVisibility").textContent = metrics.sun_visible ? "Available" : "Unavailable";
+        $("earthVisibility").textContent = metrics.earth_visible ? "Available" : "Unavailable";
+        $("communicationHours").textContent = formatNumber(metrics.communication_hours, " hrs");
     }
 
-
     function formatNumber(value, suffix = "") {
-
-        if (
-            value === null ||
-            value === undefined ||
-            !Number.isFinite(Number(value))
-        ) {
+        if (value === null || value === undefined || !Number.isFinite(Number(value))) {
             return "--";
         }
-
         return Number(value).toFixed(2) + suffix;
     }
 
+    // JPL POSITION DATA
+    function displayJPLPositions(data) {
+        const selector = $("positionTimeSelect");
+        selector.innerHTML = "";
 
-    // --------------------------------------------------
+        data.samples.forEach(function(sample, index) {
+            const option = document.createElement("option");
+            option.value = index;
+            option.textContent = formatDate(sample.time);
+            selector.appendChild(option);
+        });
+
+        selector.disabled = false;
+        selector.value = "0";
+
+        initializeTemporalDynamics(data);
+        displaySelectedPosition(0);
+
+        selector.onchange = function() {
+            stopAnimation();
+            displaySelectedPosition(Number(selector.value));
+        };
+    }
+
+    function displaySelectedPosition(index) {
+        if (!missionData || !Array.isArray(missionData.samples)) return;
+
+        const samples = missionData.samples;
+        if (index < 0 || index >= samples.length) return;
+
+        currentSampleIndex = index;
+        const sample = samples[index];
+
+        $("sunAzimuth").textContent = formatNumber(sample.solar_azimuth_deg, "°");
+        $("sunElevation").textContent = formatNumber(sample.solar_elevation_deg, "°");
+        $("earthAzimuth").textContent = formatNumber(sample.earth_azimuth_deg, "°");
+        $("earthElevation").textContent = formatNumber(sample.earth_elevation_deg, "°");
+
+        $("positionSampleTime").textContent = "Position data for " + formatDate(sample.time);
+        $("positionSampleNumber").textContent = (index + 1) + " of " + samples.length;
+        $("positionTimeSelect").value = String(index);
+        $("timeSlider").value = index;
+
+        updateTemporalDisplay(index);
+    }
+
+    // SUNSET AND EARTHSET COUNTDOWN
+    function findNextSetEvent(index, elevationField) {
+        if (!missionData || !missionData.samples.length) return null;
+
+        const samples = missionData.samples;
+        const currentTime = new Date(samples[index].time).getTime();
+
+        if (
+            index > 0 &&
+            Number(samples[index][elevationField]) === 0 &&
+            Number(samples[index - 1][elevationField]) > 0
+        ) {
+            return currentTime;
+        }
+
+        for (let i = index; i < samples.length - 1; i++) {
+            const firstElevation = Number(samples[i][elevationField]);
+            const secondElevation = Number(samples[i + 1][elevationField]);
+
+            if (firstElevation > 0 && secondElevation <= 0) {
+                const firstTime = new Date(samples[i].time).getTime();
+                const secondTime = new Date(samples[i + 1].time).getTime();
+
+                const fraction = firstElevation / (firstElevation - secondElevation);
+                const eventTime = firstTime + fraction * (secondTime - firstTime);
+
+                if (eventTime >= currentTime) return eventTime;
+            }
+        }
+
+        return null;
+    }
+
+    function formatCountdown(eventTime, currentTime) {
+        if (eventTime === null) return "No event found";
+
+        const remainingMilliseconds = eventTime - currentTime;
+        if (remainingMilliseconds <= 0) return "Happening now";
+
+        const totalMinutes = Math.floor(remainingMilliseconds / 60000);
+        const days = Math.floor(totalMinutes / 1440);
+        const hours = Math.floor((totalMinutes % 1440) / 60);
+        const minutes = totalMinutes % 60;
+
+        if (days > 0) {
+            return days + "d " +
+                String(hours).padStart(2, "0") + "h " +
+                String(minutes).padStart(2, "0") + "m";
+        }
+
+        return hours + "h " + String(minutes).padStart(2, "0") + "m";
+    }
+
+    function updateEventCountdown(index) {
+        if (!missionData) return;
+
+        const samples = missionData.samples;
+        const currentTime = new Date(samples[index].time).getTime();
+
+        const sunsetTime = findNextSetEvent(index, "solar_elevation_deg");
+        const earthsetTime = findNextSetEvent(index, "earth_elevation_deg");
+
+        $("sunsetCountdown").textContent = sunsetTime === null
+            ? "No event in period"
+            : formatCountdown(sunsetTime, currentTime);
+
+        $("earthsetCountdown").textContent = earthsetTime === null
+            ? "No event in period"
+            : formatCountdown(earthsetTime, currentTime);
+
+        $("sunsetEventTime").textContent = sunsetTime === null
+            ? "No sunset transition found in the remaining evaluation period."
+            : "Estimated sunset: " + formatDate(sunsetTime);
+
+        $("earthsetEventTime").textContent = earthsetTime === null
+            ? "No Earthset transition found in the remaining evaluation period."
+            : "Estimated Earthset: " + formatDate(earthsetTime);
+    }
+
+    // TEMPORAL INITIALIZATION
+    function initializeTemporalDynamics(data) {
+        stopAnimation();
+
+        const samples = data.samples;
+        currentSampleIndex = 0;
+
+        $("timeSlider").min = 0;
+        $("timeSlider").max = samples.length - 1;
+        $("timeSlider").value = 0;
+        $("timeSlider").disabled = false;
+
+        $("playButton").disabled = false;
+        $("previousButton").disabled = false;
+        $("nextButton").disabled = false;
+        $("resetButton").disabled = false;
+
+        $("animationStatus").textContent = samples.length + " JPL position samples loaded.";
+
+        createTemporalChart(data);
+        updateTemporalDisplay(0);
+    }
+
+    // TEMPORAL CHART
+    function createTemporalChart(data) {
+        const samples = data.samples;
+
+        const labels = samples.map(sample => formatChartTime(sample.time));
+        const sunValues = samples.map(sample => Number(sample.solar_elevation_deg));
+        const earthValues = samples.map(sample => Number(sample.earth_elevation_deg));
+
+        if (temporalChart) temporalChart.destroy();
+
+        temporalChart = new Chart($("temporalChart").getContext("2d"), {
+            type: "line",
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: "Sun elevation",
+                        data: sunValues,
+                        borderColor: "#eab308",
+                        backgroundColor: "rgba(234,179,8,0.08)",
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        tension: 0.25,
+                        fill: false
+                    },
+                    {
+                        label: "Earth elevation",
+                        data: earthValues,
+                        borderColor: "#3b82f6",
+                        backgroundColor: "rgba(59,130,246,0.08)",
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        tension: 0.25,
+                        fill: false
+                    },
+                    {
+                        label: "Current Sun position",
+                        data: samples.map(() => null),
+                        borderColor: "#fff",
+                        backgroundColor: "#eab308",
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        showLine: false
+                    },
+                    {
+                        label: "Current Earth position",
+                        data: samples.map(() => null),
+                        borderColor: "#fff",
+                        backgroundColor: "#3b82f6",
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        showLine: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                interaction: { intersect: false, mode: "index" },
+                plugins: {
+                    legend: { labels: { color: "#cbd5e1" } },
+                    tooltip: {
+                        callbacks: {
+                            title: function(items) {
+                                return formatDate(samples[items[0].dataIndex].time);
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: "#94a3b8", maxTicksLimit: 12, maxRotation: 0 },
+                        grid: { color: "#263344" },
+                        title: { display: true, text: "Mission time", color: "#cbd5e1" }
+                    },
+                    y: {
+                        ticks: { color: "#94a3b8" },
+                        grid: { color: "#263344" },
+                        title: { display: true, text: "Elevation (degrees)", color: "#cbd5e1" }
+                    }
+                }
+            }
+        });
+
+        updateTemporalChartCursor(0);
+    }
+
+    function updateTemporalChartCursor(index) {
+        if (!temporalChart || !missionData) return;
+
+        const samples = missionData.samples;
+        const sunMarker = samples.map(() => null);
+        const earthMarker = samples.map(() => null);
+
+        sunMarker[index] = Number(samples[index].solar_elevation_deg);
+        earthMarker[index] = Number(samples[index].earth_elevation_deg);
+
+        temporalChart.data.datasets[2].data = sunMarker;
+        temporalChart.data.datasets[3].data = earthMarker;
+        temporalChart.update("none");
+    }
+
+    // TEMPORAL DISPLAY
+    function updateTemporalDisplay(index) {
+        if (!missionData) return;
+
+        const samples = missionData.samples;
+        const sample = samples[index];
+        if (!sample) return;
+
+        $("animationTime").textContent = formatDate(sample.time);
+
+        const progress = samples.length > 1
+            ? (index / (samples.length - 1)) * 100
+            : 100;
+
+        $("animationProgress").style.width = progress + "%";
+        $("timeSlider").value = index;
+
+        $("animationStatus").textContent =
+            "Sample " + (index + 1) + " of " + samples.length +
+            " | " + formatNumber(sample.solar_elevation_deg, "°") +
+            " Sun elevation | " + formatNumber(sample.earth_elevation_deg, "°") +
+            " Earth elevation";
+
+        $("previousButton").disabled = index === 0;
+        $("nextButton").disabled = index === samples.length - 1;
+
+        updateTemporalChartCursor(index);
+        updateTimelinePlayheads(sample.time);
+        updateEventCountdown(index);
+    }
+
+    $("timeSlider").addEventListener("input", function() {
+        stopAnimation();
+        displaySelectedPosition(Number(this.value));
+    });
+
+    $("playButton").addEventListener("click", function() {
+        if (animationTimer) stopAnimation();
+        else startAnimation();
+    });
+
+    function startAnimation() {
+        if (!missionData) return;
+
+        const samples = missionData.samples;
+
+        if (currentSampleIndex >= samples.length - 1) {
+            displaySelectedPosition(0);
+        }
+
+        stopAnimation();
+        $("playButton").textContent = "Pause";
+        $("animationStatus").textContent = "Animation playing...";
+
+        const speed = Number($("animationSpeed").value);
+        animationTimer = setInterval(function() {
+            if (currentSampleIndex >= samples.length - 1) {
+                stopAnimation();
+                $("animationStatus").textContent = "Mission timeline animation completed.";
+                return;
+            }
+
+            displaySelectedPosition(currentSampleIndex + 1);
+        }, 1000 / speed);
+    }
+
+    function stopAnimation() {
+        if (animationTimer !== null) {
+            clearInterval(animationTimer);
+            animationTimer = null;
+        }
+        $("playButton").textContent = "Play";
+    }
+
+    $("previousButton").addEventListener("click", function() {
+        stopAnimation();
+        if (currentSampleIndex > 0) displaySelectedPosition(currentSampleIndex - 1);
+    });
+
+    $("nextButton").addEventListener("click", function() {
+        stopAnimation();
+        if (missionData && currentSampleIndex < missionData.samples.length - 1) {
+            displaySelectedPosition(currentSampleIndex + 1);
+        }
+    });
+
+    $("resetButton").addEventListener("click", function() {
+        stopAnimation();
+        if (missionData) displaySelectedPosition(0);
+    });
+
+    $("animationSpeed").addEventListener("change", function() {
+        if (animationTimer) {
+            stopAnimation();
+            startAnimation();
+        }
+    });
+
+    // TIMELINE PLAYHEADS
+    function updateTimelinePlayheads(sampleTime) {
+        if (!missionData) return;
+
+        const start = new Date(missionData.start_time);
+        const end = new Date(missionData.end_time);
+        const current = new Date(sampleTime);
+        const totalDuration = end.getTime() - start.getTime();
+
+        if (totalDuration <= 0) return;
+
+        const percentage = Math.max(
+            0,
+            Math.min(100, ((current.getTime() - start.getTime()) / totalDuration) * 100)
+        );
+
+        ["solarTimeline", "earthTimeline"].forEach(function(id) {
+            const track = $(id);
+            let playhead = track.querySelector(".timeline-playhead");
+
+            if (!playhead) {
+                playhead = document.createElement("div");
+                playhead.className = "timeline-playhead";
+                Object.assign(playhead.style, {
+                    position: "absolute",
+                    top: "0",
+                    bottom: "0",
+                    width: "2px",
+                    background: "#ffffff",
+                    zIndex: "5",
+                    pointerEvents: "none",
+                    boxShadow: "0 0 7px rgba(255,255,255,0.7)"
+                });
+                track.appendChild(playhead);
+            }
+
+            playhead.style.left = percentage + "%";
+        });
+    }
+
     // AVAILABILITY TIMELINE
-    // --------------------------------------------------
-
     function displayTimeline(data) {
-
         const start = new Date(data.start_time);
         const end = new Date(data.end_time);
+        const totalDuration = end.getTime() - start.getTime();
 
-        const totalDuration =
-            end.getTime() - start.getTime();
-
-        if (totalDuration <= 0) {
-            throw new Error("Invalid timeline date range.");
-        }
+        if (totalDuration <= 0) throw new Error("Invalid timeline date range.");
 
         const solarTrack = $("solarTimeline");
         const earthTrack = $("earthTimeline");
@@ -1368,12 +1690,7 @@
         solarTrack.innerHTML = "";
         earthTrack.innerHTML = "";
 
-        selectedIntervalElement = null;
-
-        $("timelineDetails").style.display = "none";
-
-        data.intervals.forEach(function(interval, index) {
-
+        data.intervals.forEach(function(interval) {
             const intervalStart = new Date(interval.start);
             const intervalEnd = new Date(interval.end);
 
@@ -1381,302 +1698,315 @@
                 Number.isNaN(intervalStart.getTime()) ||
                 Number.isNaN(intervalEnd.getTime()) ||
                 intervalEnd <= intervalStart
-            ) {
-                return;
-            }
+            ) return;
 
-            const left =
-                (
-                    (intervalStart.getTime() - start.getTime()) /
-                    totalDuration
-                ) * 100;
-
-            const width =
-                (
-                    (intervalEnd.getTime() - intervalStart.getTime()) /
-                    totalDuration
-                ) * 100;
+            const left = ((intervalStart.getTime() - start.getTime()) / totalDuration) * 100;
+            const width = ((intervalEnd.getTime() - intervalStart.getTime()) / totalDuration) * 100;
 
             const safeLeft = Math.max(0, Math.min(100, left));
-
-            const safeRight = Math.max(
-                safeLeft,
-                Math.min(100, left + width)
-            );
-
-            const safeWidth = safeRight - safeLeft;
+            const safeRight = Math.max(safeLeft, Math.min(100, left + width));
 
             const element = document.createElement("div");
-
-            element.className =
-                "timeline-interval " +
+            element.className = "timeline-interval " +
                 (interval.type === "sun" ? "solar" : "earth");
 
             element.style.left = safeLeft + "%";
-            element.style.width = safeWidth + "%";
+            element.style.width = (safeRight - safeLeft) + "%";
+            element.title = interval.type.toUpperCase() + " | " +
+                interval.start + " - " + interval.end;
 
-            element.title =
-                interval.type.toUpperCase() +
-                " | " +
-                interval.start +
-                " - " +
-                interval.end;
-
-            element.setAttribute(
-                "aria-label",
-                interval.type + " availability interval " + (index + 1)
-            );
-
-            element.addEventListener("click", function() {
-
-                if (selectedIntervalElement) {
-                    selectedIntervalElement.classList.remove("selected");
-                }
-
-                element.classList.add("selected");
-
-                selectedIntervalElement = element;
-
-                displayIntervalDetails(interval);
-            });
-
-            if (interval.type === "sun") {
-                solarTrack.appendChild(element);
-            }
-
-            if (interval.type === "earth") {
-                earthTrack.appendChild(element);
-            }
+            if (interval.type === "sun") solarTrack.appendChild(element);
+            if (interval.type === "earth") earthTrack.appendChild(element);
         });
 
         if (!solarTrack.children.length) {
-
-            solarTrack.innerHTML =
-                '<div class="timeline-empty">No solar intervals.</div>';
+            solarTrack.innerHTML = '<div class="timeline-empty">No solar intervals.</div>';
         }
 
         if (!earthTrack.children.length) {
-
-            earthTrack.innerHTML =
-                '<div class="timeline-empty">No Earth communication intervals.</div>';
+            earthTrack.innerHTML = '<div class="timeline-empty">No Earth communication intervals.</div>';
         }
 
         displayTimelineAxis(start, end);
+
+        if (missionData && missionData.samples.length) {
+            updateTimelinePlayheads(missionData.samples[currentSampleIndex].time);
+        }
     }
 
-
     function displayTimelineAxis(start, end) {
-
         const axis = $("timelineAxis");
-
-        const duration =
-            end.getTime() - start.getTime();
-
+        const duration = end.getTime() - start.getTime();
         axis.innerHTML = "";
 
         for (let i = 0; i <= 4; i++) {
-
-            const date = new Date(
-                start.getTime() + duration * (i / 4)
-            );
-
+            const date = new Date(start.getTime() + duration * (i / 4));
             const label = document.createElement("span");
 
-            label.textContent =
-                date.toLocaleString([], {
-                    month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit"
-                });
+            label.textContent = date.toLocaleString([], {
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
 
             axis.appendChild(label);
         }
     }
 
-
-    // --------------------------------------------------
-    // CLICKABLE TIMELINE DETAILS
-    // --------------------------------------------------
-
-    function displayIntervalDetails(interval) {
-
-        const details = $("timelineDetails");
-
-        details.style.display = "block";
-
-        const isSolar = interval.type === "sun";
-
-        $("detailTitle").textContent =
-            isSolar
-                ? "Solar Availability Details"
-                : "Direct Earth Communication Details";
-
-        $("detailType").textContent =
-            isSolar
-                ? "Solar availability"
-                : "Earth communication";
-
-        $("detailStart").textContent =
-            formatDate(interval.start);
-
-        $("detailEnd").textContent =
-            formatDate(interval.end);
-
-        const metrics = interval.metrics || {};
-
-        $("detailDuration").textContent =
-            formatNumber(metrics.duration_hours, " hours");
-
-        $("detailMaximum").textContent =
-            formatNumber(metrics.maximum_elevation_deg, "°");
-
-        $("detailMean").textContent =
-            formatNumber(metrics.mean_elevation_deg, "°");
-
-        displayIntervalChart(interval);
-
-        details.scrollIntoView({
-            behavior: "smooth",
-            block: "nearest"
-        });
+    // PERMANENT AVAILABILITY DETAILS
+    function getIntervalsByType(type) {
+        if (!missionData) return [];
+        return missionData.intervals.filter(interval => interval.type === type);
     }
 
-
-    function formatDate(value) {
-
-        const date = new Date(value);
-
-        if (Number.isNaN(date.getTime())) {
-            return "--";
+    function getIntervalDuration(interval) {
+        if (
+            interval.metrics &&
+            Number.isFinite(Number(interval.metrics.duration_hours))
+        ) {
+            return Number(interval.metrics.duration_hours);
         }
 
-        return date.toLocaleString();
+        const start = new Date(interval.start).getTime();
+        const end = new Date(interval.end).getTime();
+
+        return Math.max(0, (end - start) / 3600000);
     }
 
+    function getTotalDuration(intervals) {
+        return intervals.reduce((total, interval) => {
+            return total + getIntervalDuration(interval);
+        }, 0);
+    }
 
-    // --------------------------------------------------
-    // INTERVAL ELEVATION GRAPH
-    // --------------------------------------------------
+    function getMaximumElevation(intervals) {
+        const values = intervals
+            .map(interval => Number(interval.metrics?.maximum_elevation_deg))
+            .filter(Number.isFinite);
 
-    function displayIntervalChart(interval) {
+        return values.length ? Math.max(...values) : null;
+    }
 
-        if (!missionData) return;
+    function displayAvailabilityDetails(data) {
+        const solarIntervals = data.intervals.filter(item => item.type === "sun");
+        const earthIntervals = data.intervals.filter(item => item.type === "earth");
 
-        const isSolar = interval.type === "sun";
-
-        const start = new Date(interval.start);
-        const end = new Date(interval.end);
-
-        const selectedSamples = missionData.samples.filter(
-            function(sample) {
-
-                const time = new Date(sample.time);
-
-                return time >= start && time <= end;
-            }
+        displayAvailabilitySummary(
+            solarIntervals,
+            "solar",
+            "solarIntervalsList",
+            "solarTotalDuration",
+            "solarIntervalCount",
+            "solarMaximumElevation"
         );
 
-        const labels = selectedSamples.map(function(sample) {
+        displayAvailabilitySummary(
+            earthIntervals,
+            "earth",
+            "earthIntervalsList",
+            "earthTotalDuration",
+            "earthIntervalCount",
+            "earthMaximumElevation"
+        );
 
-            return new Date(sample.time).toLocaleTimeString(
-                [],
-                {
-                    hour: "2-digit",
-                    minute: "2-digit"
-                }
-            );
-        });
+        createAvailabilityChart(
+            "solar",
+            "solarAvailabilityChart",
+            "solarAvailability"
+        );
 
-        const values = selectedSamples.map(function(sample) {
+        createAvailabilityChart(
+            "earth",
+            "earthAvailabilityChart",
+            "earthAvailability"
+        );
 
-            return isSolar
-                ? sample.solar_elevation_deg
-                : sample.earth_elevation_deg;
-        });
+        // Keep the selected tab visible and refresh its chart.
+        displayAvailabilityTab(
+            document.querySelector(".availability-tab.active")?.dataset.tab || "solarPanel"
+        );
+    }
 
-        if (intervalChart) {
-            intervalChart.destroy();
+    function displayAvailabilitySummary(
+        intervals,
+        type,
+        listId,
+        totalId,
+        countId,
+        maximumId
+    ) {
+        const totalDuration = getTotalDuration(intervals);
+        const maximumElevation = getMaximumElevation(intervals);
+
+        $(totalId).textContent = formatNumber(totalDuration, " hours");
+        $(countId).textContent = intervals.length;
+        $(maximumId).textContent = formatNumber(maximumElevation, "°");
+
+        const list = $(listId);
+        list.innerHTML = "";
+
+        if (!intervals.length) {
+            const empty = document.createElement("div");
+            empty.className = "availability-empty";
+            empty.textContent = type === "solar"
+                ? "No sunlight availability intervals were found during this evaluation period."
+                : "No direct Earth communication windows were found during this evaluation period.";
+            list.appendChild(empty);
+            return;
         }
 
-        const context = $("intervalChart").getContext("2d");
+        intervals.forEach(function(interval, index) {
+            const card = document.createElement("div");
+            card.className = "availability-interval-card" +
+                (type === "earth" ? " earth" : "");
 
-        intervalChart = new Chart(context, {
+            const title = document.createElement("h4");
+            title.textContent = (type === "solar" ? "Sunlight Period " : "Communication Window ") + (index + 1);
 
+            const grid = document.createElement("div");
+            grid.className = "availability-interval-grid";
+
+            const fields = [
+                ["Start Time", formatDate(interval.start)],
+                ["End Time", formatDate(interval.end)],
+                ["Duration", formatNumber(getIntervalDuration(interval), " hours")],
+                ["Maximum Elevation", formatNumber(interval.metrics?.maximum_elevation_deg, "°")],
+                ["Mean Elevation", formatNumber(interval.metrics?.mean_elevation_deg, "°")]
+            ];
+
+            fields.forEach(function(field) {
+                const item = document.createElement("div");
+                const label = document.createElement("span");
+                const value = document.createElement("strong");
+
+                label.textContent = field[0];
+                value.textContent = field[1];
+
+                item.appendChild(label);
+                item.appendChild(value);
+                grid.appendChild(item);
+            });
+
+            card.appendChild(title);
+            card.appendChild(grid);
+            list.appendChild(card);
+        });
+    }
+
+    // PERMANENT TAB SWITCHING
+    document.querySelectorAll(".availability-tab").forEach(function(tab) {
+        tab.addEventListener("click", function() {
+            displayAvailabilityTab(this.dataset.tab);
+        });
+    });
+
+    function displayAvailabilityTab(panelId) {
+        document.querySelectorAll(".availability-tab").forEach(function(tab) {
+            const active = tab.dataset.tab === panelId;
+            tab.classList.toggle("active", active);
+            tab.setAttribute("aria-selected", active ? "true" : "false");
+        });
+
+        document.querySelectorAll(".availability-panel").forEach(function(panel) {
+            panel.classList.toggle("active", panel.id === panelId);
+        });
+
+        if (missionData) {
+            if (panelId === "solarPanel" && solarAvailabilityChart) {
+                solarAvailabilityChart.resize();
+            }
+
+            if (panelId === "earthPanel" && earthAvailabilityChart) {
+                earthAvailabilityChart.resize();
+            }
+        }
+    }
+
+    // FULL-PERIOD ELEVATION CHARTS FOR EACH TAB
+    function createAvailabilityChart(type, canvasId, chartType) {
+        if (!missionData) return;
+
+        const isSolar = type === "solar";
+        const samples = missionData.samples;
+
+        const chartData = samples.map(function(sample) {
+            return {
+                x: new Date(sample.time).getTime(),
+                y: Number(
+                    isSolar
+                        ? sample.solar_elevation_deg
+                        : sample.earth_elevation_deg
+                )
+            };
+        });
+
+        const chartVariable = isSolar ? "solarAvailabilityChart" : "earthAvailabilityChart";
+
+        if (isSolar && solarAvailabilityChart) solarAvailabilityChart.destroy();
+        if (!isSolar && earthAvailabilityChart) earthAvailabilityChart.destroy();
+
+        const start = new Date(missionData.start_time).getTime();
+        const end = new Date(missionData.end_time).getTime();
+
+        const chart = new Chart($(canvasId).getContext("2d"), {
             type: "line",
-
             data: {
-
-                labels: labels,
-
                 datasets: [{
-
-                    label: isSolar
-                        ? "Solar elevation"
-                        : "Earth elevation",
-
-                    data: values,
-
-                    borderColor: isSolar
-                        ? "#eab308"
-                        : "#3b82f6",
-
+                    label: isSolar ? "Sun elevation" : "Earth elevation",
+                    data: chartData,
+                    borderColor: isSolar ? "#eab308" : "#3b82f6",
                     backgroundColor: isSolar
-                        ? "rgba(234, 179, 8, 0.12)"
-                        : "rgba(59, 130, 246, 0.12)",
-
+                        ? "rgba(234,179,8,0.10)"
+                        : "rgba(59,130,246,0.10)",
                     fill: true,
-
-                    tension: 0.3,
-
-                    pointRadius: 3
+                    tension: 0.25,
+                    pointRadius: 0,
+                    pointHitRadius: 8,
+                    borderWidth: 2
                 }]
             },
-
             options: {
-
                 responsive: true,
-
                 maintainAspectRatio: false,
-
+                animation: false,
                 plugins: {
-
-                    legend: {
-                        labels: {
-                            color: "#cbd5e1"
+                    legend: { labels: { color: "#cbd5e1" } },
+                    tooltip: {
+                        callbacks: {
+                            title: function(items) {
+                                return items.length
+                                    ? new Date(items[0].parsed.x).toLocaleString()
+                                    : "";
+                            }
                         }
                     }
                 },
-
                 scales: {
-
                     x: {
-
+                        type: "linear",
+                        min: start,
+                        max: end,
                         ticks: {
-                            color: "#94a3b8"
+                            color: "#94a3b8",
+                            maxTicksLimit: 10,
+                            callback: value => new Date(Number(value)).toLocaleString([], {
+                                month: "short",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit"
+                            })
                         },
-
-                        grid: {
-                            color: "#263344"
-                        },
-
+                        grid: { color: "#263344" },
                         title: {
                             display: true,
-                            text: "Time",
+                            text: "Mission Date and Time",
                             color: "#cbd5e1"
                         }
                     },
-
                     y: {
-
-                        ticks: {
-                            color: "#94a3b8"
-                        },
-
-                        grid: {
-                            color: "#263344"
-                        },
-
+                        ticks: { color: "#94a3b8" },
+                        grid: { color: "#263344" },
                         title: {
                             display: true,
                             text: "Elevation (degrees)",
@@ -1686,37 +2016,46 @@
                 }
             }
         });
+
+        if (isSolar) solarAvailabilityChart = chart;
+        else earthAvailabilityChart = chart;
     }
 
+    // DATE FORMATTING
+    function formatDate(value) {
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return "--";
+        return date.toLocaleString();
+    }
 
-    // --------------------------------------------------
-    // FEASIBILITY DISPLAY
-    // --------------------------------------------------
+    function formatChartTime(value) {
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return "";
 
-    function displayFeasibility(data) {
-
-        const feasibility = data.feasibility;
-
-        $("feasibilityRating").textContent =
-            feasibility.rating || "Not assessed";
-
-        $("feasibilitySummary").textContent =
-            feasibility.summary || "No summary returned.";
-
-        const reasons = $("feasibilityReasons");
-
-        reasons.innerHTML = "";
-
-        (feasibility.reasons || []).forEach(function(reason) {
-
-            const item = document.createElement("li");
-
-            item.textContent = reason;
-
-            reasons.appendChild(item);
+        return date.toLocaleString([], {
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
         });
     }
 
+    // FEASIBILITY
+    function displayFeasibility(data) {
+        const feasibility = data.feasibility;
+
+        $("feasibilityRating").textContent = feasibility.rating || "Not assessed";
+        $("feasibilitySummary").textContent = feasibility.summary || "No summary returned.";
+
+        const reasons = $("feasibilityReasons");
+        reasons.innerHTML = "";
+
+        (feasibility.reasons || []).forEach(function(reason) {
+            const item = document.createElement("li");
+            item.textContent = reason;
+            reasons.appendChild(item);
+        });
+    }
 </script>
 
 </body>
